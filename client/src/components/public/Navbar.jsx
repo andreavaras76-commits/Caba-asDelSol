@@ -40,21 +40,21 @@ export default function Navbar() {
           solid && !open ? 'bg-crema/85 shadow-[0_1px_0_rgba(122,74,42,0.1)] backdrop-blur-xl' : 'bg-transparent'
         }`}
       >
-        <nav className="container-sol flex h-[72px] items-center justify-between gap-4" aria-label="Principal">
-          <Link to="/" className="group flex items-center gap-2.5" onClick={() => setOpen(false)}>
-            <SunLogo className="h-10 w-10 transition-transform duration-700 group-hover:rotate-[20deg]" />
-            <span className="flex flex-col leading-none">
-              <span className={`font-serif text-xl font-semibold transition-colors ${solid ? 'text-cerro-profundo' : 'text-white'} ${open ? '!text-crema' : ''}`}>
+        <nav className="container-sol flex h-[60px] items-center justify-between gap-3 sm:h-[72px]" aria-label="Principal">
+          <Link to="/" className="group flex items-center gap-2 sm:gap-2.5" onClick={() => setOpen(false)}>
+            <SunLogo className="h-8 w-8 shrink-0 transition-transform duration-700 group-hover:rotate-[20deg] sm:h-10 sm:w-10" />
+            <span className="flex min-w-0 flex-col whitespace-nowrap leading-none">
+              <span className={`font-serif text-base font-semibold transition-colors sm:text-xl ${solid ? 'text-cerro-profundo' : 'text-white'} ${open ? '!text-crema' : ''}`}>
                 {settings.businessName}
               </span>
-              <span className={`font-script text-lg transition-colors ${solid ? 'text-tejido-ink' : 'text-sol-200'} ${open ? '!text-sol-200' : ''}`}>
+              <span className={`font-script text-sm transition-colors sm:text-lg ${solid ? 'text-tejido-ink' : 'text-sol-200'} ${open ? '!text-sol-200' : ''}`}>
                 {settings.location}
               </span>
               <span className="sr-only"> — ir al inicio</span>
             </span>
           </Link>
 
-          <ul className="hidden items-center gap-1 lg:flex">
+          <ul className="hidden items-center gap-1 xl:flex">
             {NAV_LINKS.filter((l) => !l.mobileOnly).map((l) => (
               <li key={l.id}>
                 <a
@@ -70,21 +70,21 @@ export default function Navbar() {
             ))}
           </ul>
 
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-2">
             <Magnetic className="hidden sm:inline-block">
-              <a href="/#consultar" onClick={goTo('consultar')} className="btn-sol !px-5 !py-2.5 text-sm">
+              <a href="/#consultar" onClick={goTo('consultar')} className="btn-sol whitespace-nowrap !px-5 !py-2.5 text-sm">
                 Consultar disponibilidad
               </a>
             </Magnetic>
             <button
               type="button"
               onClick={() => setOpen((o) => !o)}
-              className={`relative z-[60] rounded-full p-2.5 transition lg:hidden ${solid && !open ? 'text-carbon hover:bg-crema-dark' : 'text-white hover:bg-white/10'}`}
+              className={`relative z-[60] -mr-1 rounded-full p-2 transition sm:p-2.5 xl:hidden ${solid && !open ? 'text-carbon hover:bg-crema-dark' : 'text-white hover:bg-white/10'}`}
               aria-expanded={open}
               aria-controls="mobile-menu"
               aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
             >
-              {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              {open ? <X className="h-5 w-5 sm:h-6 sm:w-6" /> : <Menu className="h-5 w-5 sm:h-6 sm:w-6" />}
             </button>
           </div>
         </nav>
@@ -95,13 +95,15 @@ export default function Navbar() {
         {open && (
           <motion.div
             id="mobile-menu"
-            className="fixed inset-0 z-[45] flex flex-col overflow-y-auto bg-cerro-noche px-6 pb-10 pt-28 text-crema lg:hidden"
+            className="fixed inset-0 z-[45] flex flex-col overflow-y-auto overflow-x-hidden bg-cerro-noche px-6 pb-10 pt-28 text-crema xl:hidden"
             initial={{ clipPath: 'circle(0% at calc(100% - 40px) 36px)' }}
             animate={{ clipPath: 'circle(150% at calc(100% - 40px) 36px)' }}
             exit={{ clipPath: 'circle(0% at calc(100% - 40px) 36px)' }}
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           >
-            <SunLogo className="pointer-events-none absolute -right-16 top-40 h-72 w-72 opacity-10" title="" />
+            <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+              <SunLogo className="absolute -right-16 top-40 h-72 w-72 opacity-10" title="" />
+            </div>
             <motion.ul
               className="flex flex-col gap-1"
               initial="hidden"
@@ -120,13 +122,13 @@ export default function Navbar() {
               <a href={waLink(settings.contact.whatsapp)} target="_blank" rel="noopener noreferrer" className="btn-sol w-full">
                 <MessageCircle className="h-5 w-5" /> Escribinos por WhatsApp
               </a>
-              <div className="flex gap-3">
+              <div className="flex flex-wrap gap-3">
                 {settings.social.instagram && (
-                  <a href={settings.social.instagram} target="_blank" rel="noopener noreferrer" className="btn-ghost flex-1">
+                  <a href={settings.social.instagram} target="_blank" rel="noopener noreferrer" className="btn-ghost flex-1 whitespace-nowrap !px-4">
                     <Instagram className="h-5 w-5" /> Instagram
                   </a>
                 )}
-                <a href={settings.address.mapsUrl} target="_blank" rel="noopener noreferrer" className="btn-ghost flex-1">
+                <a href={settings.address.mapsUrl} target="_blank" rel="noopener noreferrer" className="btn-ghost flex-1 whitespace-nowrap !px-4">
                   <MapPin className="h-5 w-5" /> Cómo llegar
                 </a>
               </div>

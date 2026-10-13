@@ -32,7 +32,7 @@ export default function FloatingActions() {
 
   const onArrow = () => {
     if (scrolled) window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
-    else if (!scrollToId('nosotros')) window.scrollBy({ top: window.innerHeight * 0.9, behavior: 'smooth' });
+    else scrollToId('nosotros');
   };
 
   const message = `¡Hola ${businessName}! 👋 Quería hacer una consulta.`;
@@ -87,7 +87,7 @@ export default function FloatingActions() {
           whileTap={{ scale: 0.95 }}
           transition={{ type: 'spring', delay: 1.5 }}
         >
-          <span className="absolute inset-0 animate-ping rounded-full bg-[#25D366] opacity-30 motion-reduce:hidden" aria-hidden="true" />
+          <span className="absolute inset-0 animate-soft-ping rounded-full bg-[#25D366] motion-reduce:hidden" aria-hidden="true" />
           <WhatsAppIcon className="relative h-7 w-7" />
         </motion.a>
       </div>

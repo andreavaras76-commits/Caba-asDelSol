@@ -3,6 +3,18 @@
 @tailwind utilities;
 
 @layer base {
+  /* Sin scroll lateral en toda la página (`clip` no rompe los elementos sticky/fixed como `hidden`) */
+  html,
+  body {
+    max-width: 100%;
+    overflow-x: clip;
+  }
+  @supports not (overflow: clip) {
+    body {
+      overflow-x: hidden;
+    }
+  }
+
   html {
     /* Framer Motion (useScroll) necesita un contenedor posicionado */
     position: relative;

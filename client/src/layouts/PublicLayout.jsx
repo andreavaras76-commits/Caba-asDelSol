@@ -24,12 +24,9 @@ export default function PublicLayout() {
   useEffect(() => {
     const id = location.hash.replace('#', '');
     if (id) {
-      // Espera a que la sección exista (las páginas cargan con lazy)
-      let tries = 0;
-      const t = setInterval(() => {
-        if (scrollToId(id) || ++tries > 20) clearInterval(t);
-      }, 120);
-      return () => clearInterval(t);
+      // scrollToId espera a que la sección exista y corrige si el contenido de arriba cambia de alto
+      scrollToId(id);
+      return undefined;
     }
     window.scrollTo(0, 0);
     return undefined;

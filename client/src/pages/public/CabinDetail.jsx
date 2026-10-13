@@ -45,7 +45,7 @@ export default function CabinDetail() {
     <>
       <Seo title={cabin.name} description={cabin.shortDescription || cabin.description?.slice(0, 155)} image={cover?.url} path={`/cabanas/${cabin.slug}`} />
 
-      <div className="bg-crema pt-[88px]">
+      <div className="bg-crema pt-[76px] sm:pt-[88px]">
         <div className="container-sol">
           <nav aria-label="Ruta de navegación" className="flex items-center gap-1 text-sm text-carbon-light">
             <Link to="/" className="hover:text-cerro-profundo">Inicio</Link>

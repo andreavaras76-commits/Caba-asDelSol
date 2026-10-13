@@ -87,6 +87,10 @@ export default {
           '0%': { transform: 'scale(1) translate(0, 0)' },
           '100%': { transform: 'scale(1.12) translate(-1.5%, -1%)' },
         },
+        'soft-ping': {
+          '0%': { transform: 'scale(1)', opacity: '0.45' },
+          '80%, 100%': { transform: 'scale(1.35)', opacity: '0' },
+        },
         'sun-spin': {
           '0%': { transform: 'rotate(0deg)' },
           '100%': { transform: 'rotate(360deg)' },
@@ -95,6 +99,7 @@ export default {
       animation: {
         'ken-burns': 'ken-burns 14s ease-out forwards',
         'sun-spin': 'sun-spin 120s linear infinite',
+        'soft-ping': 'soft-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite',
       },
     },
   },
