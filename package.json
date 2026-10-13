@@ -1,0 +1,14 @@
+{
+  "name": "cabanas-del-sol",
+  "private": true,
+  "description": "Cabañas del Sol — Tafí del Valle (front + back)",
+  "scripts": {
+    "dev": "concurrently -k -n API,WEB -c yellow,cyan \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "install:all": "npm install && npm install --prefix server && npm install --prefix client",
+    "build": "npm run build --prefix client",
+    "seed": "npm run seed --prefix server"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
