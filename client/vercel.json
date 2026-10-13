@@ -2,11 +2,11 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://TU-BACKEND.vercel.app/api/:path*"
+      "destination": "https://caba-as-del-sol-bwnr.vercel.app/api/:path*"
     },
     {
       "source": "/sitemap.xml",
-      "destination": "https://TU-BACKEND.vercel.app/api/sitemap.xml"
+      "destination": "https://caba-as-del-sol-bwnr.vercel.app/api/sitemap.xml"
     },
     {
       "source": "/((?!assets/|favicon\\.svg|robots\\.txt|sitemap\\.xml|api/).*)",
@@ -19,7 +19,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob: https://res.cloudinary.com; connect-src 'self' https://api.open-meteo.com; frame-src https://www.google.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+          "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https://res.cloudinary.com; connect-src 'self' https://api.open-meteo.com; frame-src https://www.google.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
         },
         {
           "key": "X-Content-Type-Options",

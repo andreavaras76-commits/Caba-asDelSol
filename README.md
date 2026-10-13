@@ -77,7 +77,7 @@ Se crean **dos proyectos de Vercel** desde el mismo repositorio.
 
 ### 4.2 Frontend (`/client`)
 
-1. En **`client/vercel.json`**, reemplazar las **dos** apariciones de `https://TU-BACKEND.vercel.app` por la URL real del backend.
+1. En **`client/vercel.json`**, las dos rewrites apuntan al backend (`https://caba-as-del-sol-bwnr.vercel.app`); si cambia su URL, actualizalas.
 2. En Vercel: **New Project** → mismo repo → **Root Directory: `client`** (Framework: Vite).
 3. Variables: `VITE_API_URL=/api` y `VITE_SITE_URL=https://delsoltafidelvalle.com.ar`.
 4. Hacer el deploy y después conectar el dominio `delsoltafidelvalle.com.ar` en **Settings → Domains**.
