@@ -8,6 +8,7 @@ import Home from '@/pages/public/Home';
 // Code splitting por ruta: cada página se descarga recién cuando se visita
 const CabinDetail = lazy(() => import('@/pages/public/CabinDetail'));
 const NotFound = lazy(() => import('@/pages/public/NotFound'));
+const Feedback = lazy(() => import('@/pages/public/Feedback'));
 
 // Panel (nada de esto se descarga en el sitio público)
 const AdminRoot = lazy(() => import('@/layouts/AdminRoot'));
@@ -26,11 +27,12 @@ const content = () => import('@/pages/admin/ContentPages');
 const ServicesPage = lazy(() => content().then((m) => ({ default: m.ServicesPage })));
 const AttractionsPage = lazy(() => content().then((m) => ({ default: m.AttractionsPage })));
 const FaqsPage = lazy(() => content().then((m) => ({ default: m.FaqsPage })));
-const ReviewsPage = lazy(() => content().then((m) => ({ default: m.ReviewsPage })));
+const ReviewsPage = lazy(() => import('@/pages/admin/Reviews'));
+const NearbyPlacesPage = lazy(() => content().then((m) => ({ default: m.NearbyPlacesPage })));
+const SpecialEventsPage = lazy(() => content().then((m) => ({ default: m.SpecialEventsPage })));
 const Clients = lazy(() => import('@/pages/admin/Clients'));
 const PromoSender = lazy(() => import('@/pages/admin/PromoSender'));
 const Settings = lazy(() => import('@/pages/admin/Settings'));
-const Account = lazy(() => import('@/pages/admin/Account'));
 
 export default function App() {
   return (
@@ -39,6 +41,7 @@ export default function App() {
         <Route element={<PublicLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/cabanas/:slug" element={<CabinDetail />} />
+          <Route path="/opinar/:token" element={<Feedback />} />
           <Route path="*" element={<NotFound />} />
         </Route>
 
@@ -59,7 +62,8 @@ export default function App() {
               <Route path="atractivos" element={<AttractionsPage />} />
               <Route path="preguntas" element={<FaqsPage />} />
               <Route path="resenas" element={<ReviewsPage />} />
-              <Route path="cuenta" element={<Account />} />
+              <Route path="cerca" element={<NearbyPlacesPage />} />
+              <Route path="eventos-especiales" element={<SpecialEventsPage />} />
               <Route path="clientes" element={<Clients />} />
               <Route path="enviar-promos" element={<PromoSender />} />
               <Route path="configuracion" element={<Settings />} />
