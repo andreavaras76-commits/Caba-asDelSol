@@ -1,5 +1,5 @@
 const { Schema, model } = require('mongoose');
-const { INQUIRY_TYPES, INQUIRY_STATUS } = require('../utils/constants');
+const { INQUIRY_TYPES, INQUIRY_STATUS, SLEEPING_OPTIONS } = require('../utils/constants');
 
 /** Registro de cada consulta enviada por WhatsApp desde el sitio */
 const inquirySchema = new Schema(
@@ -18,11 +18,13 @@ const inquirySchema = new Schema(
     nights: Number,
     guests: Number,
     pets: { type: Boolean, default: false },
+    sleepingPreference: { type: String, enum: [...SLEEPING_OPTIONS, ''], default: '' },
 
     // Eventos / día de campo
     eventType: { type: String, trim: true, default: '' },
     eventDate: Date,
     people: Number,
+    hours: Number, // duración del evento (mínimo 3)
     withLodging: { type: Boolean, default: false },
 
     comments: { type: String, trim: true, default: '' },
