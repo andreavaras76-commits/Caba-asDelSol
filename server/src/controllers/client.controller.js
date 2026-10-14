@@ -89,16 +89,13 @@ exports.remove = asyncHandler(async (req, res) => {
 });
 
 /** Convierte una consulta en cliente con un clic (o la vincula si el teléfono ya existe) */
-exports.fromInquiry = asyncHandler(async (req, res) => {
-  const inquiry = await Inquiry.findById(req.params.inquiryId);
-  if (!inquiry) throw ApiError.notFound('Consulta no encontrada');
-
-  const phone = toWhatsapp(req.body.phone || inquiry.phone);
-  if (!/^\d{10,15}$/.test(phone)) {
-    throw ApiError.badRequest('La consulta no tiene un WhatsApp válido. Cargalo para crear el cliente.', [
-      { field: 'phone', message: 'WhatsApp inválido' },
-    ]);
-  }
+/**
+ * Crea o vincula el cliente de una consulta (por su WhatsApp). Devuelve null si no hay teléfono válido.
+ * Se usa al tocar "Pasar a cliente" y automáticamente al marcar una consulta como "Reservó".
+ */
+async function clientFromInquiry(inquiry, rawPhone) {
+  const phone = toWhatsapp(rawPhone || inquiry.phone);
+  if (!/^\d{10,15}$/.test(phone)) return null;
 
   const tags = new Set();
   if (inquiry.pets) tags.add('mascota');
@@ -117,10 +114,23 @@ exports.fromInquiry = asyncHandler(async (req, res) => {
   await client.save();
 
   inquiry.client = client._id;
+  if (!inquiry.phone) inquiry.phone = phone;
   await inquiry.save();
+  return { client, isNew };
+}
 
+exports.fromInquiry = asyncHandler(async (req, res) => {
+  const inquiry = await Inquiry.findById(req.params.inquiryId);
+  if (!inquiry) throw ApiError.notFound('Consulta no encontrada');
+  const result = await clientFromInquiry(inquiry, req.body.phone);
+  if (!result) {
+    throw ApiError.badRequest('La consulta no tiene un WhatsApp válido. Cargalo para crear el cliente.', [{ field: 'phone', message: 'WhatsApp inválido' }]);
+  }
+  const { client, isNew } = result;
   success(res, client, isNew ? 'Cliente creado desde la consulta' : 'La consulta se vinculó a un cliente existente', isNew ? 201 : 200);
 });
+
+exports.clientFromInquiry = clientFromInquiry;
 
 /** Marca / desmarca una promo como enviada a un cliente */
 exports.markSent = asyncHandler(async (req, res) => {
