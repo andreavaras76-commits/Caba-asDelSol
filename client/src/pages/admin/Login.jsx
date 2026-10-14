@@ -10,7 +10,7 @@ import { Field } from '@/components/ui/FormField';
 import { LoadingBlock } from '@/components/admin/ui';
 import { loginSchema } from '@/schemas/admin.schema';
 import { useAuthStore } from '@/store/authStore';
-import { notifyError } from '@/utils/notify';
+import { toastSuccess, toastError, toastWarning } from '@/utils/notify';
 
 export default function Login() {
   const { user, ready, login } = useAuthStore();
@@ -29,10 +29,16 @@ export default function Login() {
   const onSubmit = async ({ username, password }) => {
     try {
       await login(username, password);
+      toastSuccess('¡Hola! Ingresaste al panel');
       navigate(location.state?.from || '/admin/resumen', { replace: true });
     } catch (err) {
-      notifyError(err, 'No pudimos ingresar');
+      toastError('No pudimos ingresar', err?.message || 'Revisá el usuario y la contraseña');
     }
+  };
+
+  const onInvalid = (errs) => {
+    const empty = [errs.username && 'usuario', errs.password && 'contraseña'].filter(Boolean);
+    toastWarning(`Completá ${empty.join(' y ')}`);
   };
 
   return (
@@ -54,7 +60,7 @@ export default function Login() {
           <p className="mt-3 font-script text-2xl text-tejido-ink">Panel de administración</p>
           <h1 className="text-3xl font-semibold text-cerro-profundo">Cabañas del Sol</h1>
         </div>
-        <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit, onInvalid)} noValidate className="space-y-4">
           <Field label="Usuario" error={errors.username?.message}>
             {(a) => (
               <div className="relative">

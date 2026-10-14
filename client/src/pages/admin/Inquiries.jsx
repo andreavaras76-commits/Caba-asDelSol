@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { MessageCircle, UserPlus, Trash2, StickyNote, ChevronDown, Search, FilterX, ChevronLeft, ChevronRight } from 'lucide-react';
+import { MessageCircle, UserPlus, Star, MessageSquareHeart, Trash2, StickyNote, ChevronDown, Search, FilterX, ChevronLeft, ChevronRight } from 'lucide-react';
 import { PageHeader, Card, LoadingBlock, EmptyState, IconButton } from '@/components/admin/ui';
 import { InquirySummary } from '@/components/admin/InquiryRow';
 import Modal from '@/components/ui/Modal';
@@ -12,8 +12,9 @@ import { useSettingsStore } from '@/store/settingsStore';
 import { inquiryUpdateSchema } from '@/schemas/admin.schema';
 import { INQUIRY_STATUS } from '@/utils/constants';
 import { replyLink, normalizeArPhone } from '@/utils/whatsapp';
-import { confirmDelete, notifySuccess, notifyError, handleFormError } from '@/utils/notify';
+import { confirmDelete, notifySuccess, toastSuccess, notifyError, handleFormError } from '@/utils/notify';
 import Swal from '@/utils/swal';
+import { requestFeedback } from '@/utils/feedback';
 
 const EMPTY = { status: '', type: '', cabin: '', promotion: '', from: '', to: '', q: '' };
 
@@ -41,10 +42,39 @@ export default function Inquiries() {
     setFilters((f) => ({ ...f, [k]: e.target.value }));
   };
 
+  /** Pide el WhatsApp (si la consulta no lo trae) y crea/vincula el cliente */
+  const askPhoneAndLink = async (inq) => {
+    const { value, isConfirmed } = await Swal.fire({
+      titleText: `WhatsApp de ${inq.name}`,
+      text: 'Para guardarlo como cliente (y después pedirle su opinión), copiá su número del chat de WhatsApp.',
+      input: 'tel',
+      inputPlaceholder: '(0381) 15-555-5555',
+      showCancelButton: true,
+      confirmButtonText: 'Guardar cliente',
+      cancelButtonText: 'Ahora no',
+      inputValidator: (v) => (/^\d{10,15}$/.test(normalizeArPhone(v)) ? undefined : 'Ingresá un WhatsApp válido, con código de área'),
+    });
+    if (!isConfirmed) return;
+    const res = await adminApi.clients.fromInquiry(inq._id, normalizeArPhone(value));
+    notifySuccess(res.message);
+  };
+
   const changeStatus = async (inq, status) => {
     try {
-      await adminApi.inquiries.update(inq._id, { status });
-      notifySuccess(`Marcada como "${INQUIRY_STATUS[status]}"`);
+      const res = await adminApi.inquiries.update(inq._id, { status });
+      notifySuccess(res.message || `Marcada como "${INQUIRY_STATUS[status]}"`);
+      // Reservó: el cliente se crea solo; si falta el teléfono, lo pedimos una vez
+      if (status === 'reservo' && res.data?.needsPhone) await askPhoneAndLink(inq);
+      refresh();
+    } catch (err) {
+      notifyError(err);
+    }
+  };
+
+  const askFeedback = async (inq) => {
+    try {
+      await requestFeedback(inq.client, businessName);
+      toastSuccess(`Pedido de opinión enviado a ${inq.client.name.split(' ')[0]}`);
       refresh();
     } catch (err) {
       notifyError(err);
@@ -170,9 +200,21 @@ export default function Inquiries() {
                         ) : (
                           <span className="px-2 text-xs text-carbon-light" title="La persona te escribió directo por WhatsApp: respondé en ese chat">Respondé en su chat</span>
                         )}
-                        <IconButton label={inq.client ? 'Ya es cliente (actualizar)' : 'Pasar a cliente'} tone="success" onClick={() => toClient(inq)}>
-                          <UserPlus className="h-4 w-4" />
-                        </IconButton>
+                        {inq.client?._id ? (
+                          inq.client.lastRating ? (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-sol-50 px-3 py-1.5 text-sm font-semibold" title="Opinión del huésped">
+                              <Star className="h-4 w-4 fill-sol text-sol" aria-hidden="true" /> {inq.client.lastRating}/5
+                            </span>
+                          ) : (
+                            <button type="button" onClick={() => askFeedback(inq)} className="btn !px-3 !py-2 bg-sol-100 text-sm text-madera hover:bg-sol-200">
+                              <MessageSquareHeart className="h-4 w-4" aria-hidden="true" /> {inq.client.feedbackRequestedAt ? 'Volver a pedir opinión' : 'Pedir opinión'}
+                            </button>
+                          )
+                        ) : (
+                          <IconButton label="Pasar a cliente" tone="success" onClick={() => toClient(inq)}>
+                            <UserPlus className="h-4 w-4" />
+                          </IconButton>
+                        )}
                         <IconButton label="Notas internas" onClick={() => setEditing(inq)}>
                           <StickyNote className={`h-4 w-4 ${inq.notes ? 'fill-sol-200' : ''}`} />
                         </IconButton>
