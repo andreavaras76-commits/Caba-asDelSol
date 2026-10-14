@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CalendarX2, Loader2, MessageCircle } from 'lucide-react';
-import { Field, Toggle } from '@/components/ui/FormField';
+import { Field, YesNoSelect } from '@/components/ui/FormField';
 import Magnetic from '@/components/ui/Magnetic';
 import { makeStaySchema } from '@/schemas/inquiry.schema';
 import useWhatsAppInquiry from '@/hooks/useWhatsAppInquiry';
@@ -10,6 +10,7 @@ import useFetch from '@/hooks/useFetch';
 import { publicApi } from '@/api/public';
 import { usePromoStore } from '@/store/promoStore';
 import { todayISO, addDaysISO, nightsBetween, formatDay, formatPrice, promoBadge } from '@/utils/format';
+import { SLEEPING_OPTIONS } from '@/utils/constants';
 
 const NO_BLOCKS = [];
 
@@ -31,8 +32,9 @@ export default function CabinInquiryForm({ cabin }) {
     trigger,
     formState: { errors, isSubmitted },
   } = useForm({
-    resolver: (values, ctx, opts) => zodResolver(makeStaySchema({ maxGuests: cabin.capacity, requireCabin: true, blocked }))(values, ctx, opts),
-    defaultValues: { cabin: cabin.id, checkIn: '', checkOut: '', guests: Math.min(2, cabin.capacity), pets: false, promotion: '', name: '', comments: '' },
+    resolver: (values, ctx, opts) =>
+      zodResolver(makeStaySchema({ maxGuests: cabin.capacity, requireCabin: true, blocked, sleepingOptions: cabin.sleepingOptions || [] }))(values, ctx, opts),
+    defaultValues: { cabin: cabin.id, checkIn: '', checkOut: '', guests: Math.min(2, cabin.capacity), pets: false, promotion: '', name: '', comments: '', sleepingPreference: '' },
   });
 
   const [checkIn, checkOut, promotion] = watch(['checkIn', 'checkOut', 'promotion']);
@@ -98,6 +100,20 @@ export default function CabinInquiryForm({ cabin }) {
             </select>
           )}
         </Field>
+        {cabin.sleepingOptions?.length > 0 && (
+          <Field label="¿Cómo preferís dormir?" error={errors.sleepingPreference?.message}>
+            {(a) => (
+              <select className="input" {...a} {...register('sleepingPreference')}>
+                <option value="">Me da igual</option>
+                {cabin.sleepingOptions.map((k) => (
+                  <option key={k} value={k}>
+                    {SLEEPING_OPTIONS[k]}
+                  </option>
+                ))}
+              </select>
+            )}
+          </Field>
+        )}
         {promos.length > 0 && (
           <Field label="¿Querés usar una promo?" error={errors.promotion?.message}>
             {(a) => (
@@ -115,10 +131,13 @@ export default function CabinInquiryForm({ cabin }) {
         <Field label="Tu nombre" error={errors.name?.message}>
           {(a) => <input type="text" autoComplete="given-name" className="input" {...a} {...register('name')} />}
         </Field>
+        <Field label="Tu WhatsApp (opcional)" hint="Para confirmarte la reserva más rápido." error={errors.phone?.message}>
+          {(a) => <input type="tel" inputMode="tel" autoComplete="tel" placeholder="(0381) 15-555-5555" className="input" {...a} {...register('phone')} />}
+        </Field>
         <Field label="Comentarios (opcional)" error={errors.comments?.message}>
           {(a) => <textarea rows={2} className="input resize-none" {...a} {...register('comments')} />}
         </Field>
-        <Controller name="pets" control={control} render={({ field }) => <Toggle checked={field.value} onChange={field.onChange} label="Viajo con mascota 🐾" />} />
+        <Controller name="pets" control={control} render={({ field }) => <YesNoSelect value={field.value} onChange={field.onChange} label="¿Viajás con mascota? 🐾" />} />
       </div>
 
       <Magnetic className="mt-6 w-full">

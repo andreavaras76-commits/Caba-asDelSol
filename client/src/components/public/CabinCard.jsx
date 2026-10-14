@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Users, DoorOpen, ArrowRight, Star } from 'lucide-react';
 import CldImage from '@/components/ui/CldImage';
 import CabinIllustration from '@/components/illustrations/CabinIllustration';
+import { PrivateBadge } from './CabinExtras';
 import { fadeUp } from '@/components/ui/Reveal';
 import { AMENITIES } from '@/utils/constants';
 import { getIcon } from '@/utils/icons';
@@ -62,13 +63,14 @@ export default function CabinCard({ cabin, index = 0, winter = false }) {
             ) : null}
           </div>
           {cabin.shortDescription && <p className="mt-2 line-clamp-2 text-carbon-light">{cabin.shortDescription}</p>}
+          <PrivateBadge cabin={cabin} compact className="mt-3" />
           <div className="mt-5 flex items-center justify-between border-t border-crema-dark pt-4">
             <div className="flex gap-4 text-sm font-semibold text-carbon-light">
               <span className="inline-flex items-center gap-1.5">
                 <Users className="h-4 w-4 text-cielo" aria-hidden="true" /> Hasta {cabin.capacity}
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <DoorOpen className="h-4 w-4 text-cielo" aria-hidden="true" /> {cabin.rooms} {cabin.rooms === 1 ? 'ambiente' : 'ambientes'}
+                <DoorOpen className="h-4 w-4 text-cielo" aria-hidden="true" /> {cabin.type === 'monoambiente' ? 'Monoambiente' : `${cabin.rooms} ${cabin.rooms === 1 ? 'ambiente' : 'ambientes'}`}
               </span>
             </div>
             <span className="inline-flex items-center gap-1 text-sm font-bold text-tejido-ink transition-transform group-hover:translate-x-1">
