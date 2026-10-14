@@ -16,7 +16,7 @@ export const LIMITS = {
 export const AMENITIES = {
   wifi: { label: 'WiFi', icon: 'Wifi' },
   tv: { label: 'TV satelital', icon: 'Tv' },
-  aire: { label: 'Aire acondicionado', icon: 'AirVent' },
+  aire: { label: 'Aire acondicionado frío/calor', icon: 'AirVent' },
   calefaccion: { label: 'Calefacción', icon: 'Heater' },
   hogar: { label: 'Hogar a leña', icon: 'Flame' },
   cocina: { label: 'Cocina equipada', icon: 'CookingPot' },
@@ -30,14 +30,48 @@ export const AMENITIES = {
   estacionamiento: { label: 'Estacionamiento', icon: 'Car' },
   vista_cerro: { label: 'Vista al cerro', icon: 'Mountain' },
   galeria: { label: 'Galería', icon: 'Armchair' },
+  pava: { label: 'Pava eléctrica', icon: 'Coffee' },
 };
 
 export const BED_TYPES = {
-  matrimonial: { label: 'Cama matrimonial', plural: 'Camas matrimoniales' },
-  single: { label: 'Cama de una plaza', plural: 'Camas de una plaza' },
-  cucheta: { label: 'Cucheta', plural: 'Cuchetas' },
-  sofa_cama: { label: 'Sofá cama', plural: 'Sofás cama' },
+  matrimonial: { label: 'cama matrimonial', plural: 'camas matrimoniales', icon: 'BedDouble' },
+  individual: { label: 'cama individual', plural: 'camas individuales', icon: 'BedSingle' },
+  marinera: { label: 'cama marinera', plural: 'camas marineras', icon: 'Layers' },
+  divan_cama: { label: 'diván cama', plural: 'divanes cama', icon: 'Sofa' },
 };
+
+/** Ambientes donde puede estar una cama ("¿Dónde vas a dormir?") */
+export const BED_LOCATIONS = {
+  dormitorio: 'Dormitorio',
+  cocina_comedor: 'Cocina comedor',
+  monoambiente: 'Monoambiente',
+};
+
+export const CABIN_TYPES = {
+  dormitorio: 'Dormitorio + cocina comedor',
+  monoambiente: 'Monoambiente',
+};
+
+/** Lo que el huésped elige al consultar */
+export const SLEEPING_OPTIONS = {
+  matrimonial: 'Cama matrimonial',
+  individuales: 'Camas individuales',
+};
+
+export const NEARBY_CATEGORIES = {
+  delivery: { label: 'Delivery de comida', short: 'Delivery', icon: 'Bike' },
+  supermercado: { label: 'Supermercado', short: 'Súper', icon: 'ShoppingCart' },
+  estacion_servicio: { label: 'Estación de servicio', short: 'Estación', icon: 'Fuel' },
+  carniceria: { label: 'Carnicería', short: 'Carnicería', icon: 'Beef' },
+  panaderia: { label: 'Panadería', short: 'Panadería', icon: 'Croissant' },
+  tortas: { label: 'Tortas', short: 'Tortas', icon: 'CakeSlice' },
+  paseos: { label: 'Paseos y salidas', short: 'Paseos', icon: 'Compass' },
+};
+
+export const SERVICE_GROUPS = { servicio: 'Servicio del complejo', espacio: 'Espacio común del predio' };
+
+export const EVENT_TYPES = ['Cumpleaños', 'Juntada', 'Navidad', 'Año Nuevo', 'Otro'];
+export const EVENT_MIN_HOURS = 3;
 
 export const PROMO_TYPES = {
   porcentaje: 'Porcentaje de descuento',
@@ -71,8 +105,10 @@ export const CLIENT_TAGS = {
 
 export const GALLERY_CATEGORIES = {
   cabanas: 'Cabañas',
+  habitaciones: 'Habitaciones',
   pileta: 'Pileta',
   quincho: 'Quincho',
-  invierno: 'Invierno',
+  sala_estar: 'Sala de estar',
+  estacionamiento: 'Estacionamiento',
   entorno: 'Entorno',
 };
