@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Menu, X, Instagram, MessageCircle, MapPin } from 'lucide-react';
 import SunLogo from '@/components/ui/SunLogo';
+import BrandLogo from '@/components/ui/BrandLogo';
 import Magnetic from '@/components/ui/Magnetic';
 import useScrolled from '@/hooks/useScrolled';
 import { useSettingsStore } from '@/store/settingsStore';
@@ -26,6 +27,15 @@ export default function Navbar() {
     return () => window.removeEventListener('keydown', onKey);
   }, [open]);
 
+  /** El logo lleva al home; si ya estás en el home, sube suave hasta arriba */
+  const onLogo = (e) => {
+    setOpen(false);
+    if (onHome) {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    }
+  };
+
   const goTo = (id) => (e) => {
     e.preventDefault();
     setOpen(false);
@@ -41,8 +51,8 @@ export default function Navbar() {
         }`}
       >
         <nav className="container-sol flex h-[60px] items-center justify-between gap-3 sm:h-[72px]" aria-label="Principal">
-          <Link to="/" className="group flex items-center gap-2 sm:gap-2.5" onClick={() => setOpen(false)}>
-            <SunLogo className="h-8 w-8 shrink-0 transition-transform duration-700 group-hover:rotate-[20deg] sm:h-10 sm:w-10" />
+          <Link to="/" className="group flex items-center gap-2 sm:gap-2.5" onClick={onLogo}>
+            <BrandLogo size={44} className="h-9 w-auto shrink-0 shadow-sm ring-1 ring-black/5 transition-transform duration-500 group-hover:scale-105 sm:h-11" />
             <span className="flex min-w-0 flex-col whitespace-nowrap leading-none">
               <span className={`font-serif text-base font-semibold transition-colors sm:text-xl ${solid ? 'text-cerro-profundo' : 'text-white'} ${open ? '!text-crema' : ''}`}>
                 {settings.businessName}

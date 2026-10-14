@@ -27,7 +27,7 @@ export default function Location() {
   return (
     <section id="ubicacion" className="bg-crema-dark py-20 sm:py-28">
       <div className="container-sol">
-        <SectionHeading eyebrow="Te esperamos" title="Ubicación" subtitle="A sólo 1 km de la Villa: lo bastante lejos para descansar, lo bastante cerca para disfrutar todo." />
+        <SectionHeading eyebrow="Te esperamos" title="Ubicación" subtitle="A 1,5 km de la Villa de Tafí, a menos de 5 minutos en auto. Lo justo para descansar y tener todo cerca." />
         <div className="grid gap-8 lg:grid-cols-[1.6fr_1fr]">
           <Reveal className="overflow-hidden rounded-4xl shadow-calida-lg ring-8 ring-white">
             <LazyMap title={`Mapa de ${businessName}`} src={mapEmbedUrl(address)} className="h-[360px] w-full sm:h-[460px]" label="Ver mapa interactivo" />

@@ -1,15 +1,15 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { CalendarDays, Users, Home, MessageCircle, Loader2, User } from 'lucide-react';
-import { Field, Toggle } from '@/components/ui/FormField';
+import { CalendarDays, MessageCircle, Loader2, User } from 'lucide-react';
+import { Field, YesNoSelect } from '@/components/ui/FormField';
 import Magnetic from '@/components/ui/Magnetic';
 import { makeStaySchema } from '@/schemas/inquiry.schema';
 import useWhatsAppInquiry from '@/hooks/useWhatsAppInquiry';
 import useFetch from '@/hooks/useFetch';
 import { publicApi } from '@/api/public';
 import { todayISO, addDaysISO } from '@/utils/format';
-import { LIMITS } from '@/utils/constants';
+import { LIMITS, SLEEPING_OPTIONS } from '@/utils/constants';
 
 /** Buscador flotante del hero → consulta por WhatsApp */
 export default function HeroSearch() {
@@ -17,6 +17,8 @@ export default function HeroSearch() {
   const { send, sending } = useWhatsAppInquiry();
   const maxCapacity = useMemo(() => Math.max(1, ...cabins.map((c) => c.capacity)), [cabins]);
   const capacityOf = (id) => cabins.find((c) => c.id === id)?.capacity || (cabins.length ? maxCapacity : LIMITS.GUESTS_MAX);
+  // Opciones de cama: las de la cabaña elegida, o todas si todavía no eligió
+  const sleepingFor = (id) => (id ? cabins.find((c) => c.id === id)?.sleepingOptions || [] : Object.keys(SLEEPING_OPTIONS));
 
   const {
     register,
@@ -27,12 +29,19 @@ export default function HeroSearch() {
     formState: { errors },
   } = useForm({
     // El tope de huéspedes depende de la cabaña elegida
-    resolver: (values, ctx, opts) => zodResolver(makeStaySchema({ maxGuests: capacityOf(values.cabin) }))(values, ctx, opts),
-    defaultValues: { checkIn: '', checkOut: '', guests: 2, cabin: '', pets: false, name: '' },
+    resolver: (values, ctx, opts) =>
+      zodResolver(makeStaySchema({ maxGuests: capacityOf(values.cabin), sleepingOptions: sleepingFor(values.cabin) }))(values, ctx, opts),
+    defaultValues: { checkIn: '', checkOut: '', guests: 2, cabin: '', pets: false, name: '', sleepingPreference: '' },
   });
 
   const checkIn = watch('checkIn');
   const cabinId = watch('cabin');
+  const sleepingChoices = sleepingFor(cabinId);
+  // Si cambia la cabaña y la cama elegida ya no se ofrece, se limpia
+  useEffect(() => {
+    const pref = watch('sleepingPreference');
+    if (pref && !sleepingChoices.includes(pref)) setValue('sleepingPreference', '');
+  }, [cabinId]); // eslint-disable-line react-hooks/exhaustive-deps
   const guestsMax = capacityOf(cabinId);
 
   const onSubmit = async (values) => {
@@ -43,6 +52,8 @@ export default function HeroSearch() {
   const inputCls = 'input !border-transparent !bg-white/95 !py-3 pl-10';
   // En mobile fechas y selects van sin ícono: así el texto no se corta
   const dateCls = 'input !border-transparent !bg-white/95 !py-3 !px-3 sm:!pl-10';
+  // Selects sin ícono propio: así entra el texto completo con 6 campos en una fila
+  const selCls = 'input !border-transparent !bg-white/95 !py-3 !pl-3 !pr-8';
   const dateIcon = 'pointer-events-none absolute left-3 top-1/2 hidden h-5 w-5 -translate-y-1/2 text-madera sm:block';
 
   return (
@@ -53,7 +64,7 @@ export default function HeroSearch() {
       className="glass w-full scroll-mt-28 rounded-4xl p-4 shadow-calida-lg sm:p-5"
       aria-label="Consultar disponibilidad"
     >
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-[1fr_1fr_1fr_1.25fr_1.1fr]">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-[1fr_1fr_1.1fr_1.05fr_1.15fr_1fr]">
         <Field label="Entrada" error={errors.checkIn?.message} light>
           {(a) => (
             <div className="relative">
@@ -84,8 +95,7 @@ export default function HeroSearch() {
         <Field label="Huéspedes" error={errors.guests?.message} light>
           {(a) => (
             <div className="relative">
-              <Users className={dateIcon} aria-hidden="true" />
-              <select className={dateCls} {...a} {...register('guests')}>
+              <select className={selCls} {...a} {...register('guests')}>
                 {Array.from({ length: guestsMax }, (_, i) => i + 1).map((n) => (
                   <option key={n} value={n}>
                     {n} {n === 1 ? 'huésped' : 'huéspedes'}
@@ -98,12 +108,25 @@ export default function HeroSearch() {
         <Field label="Cabaña" error={errors.cabin?.message} light>
           {(a) => (
             <div className="relative">
-              <Home className={dateIcon} aria-hidden="true" />
-              <select className={dateCls} {...a} {...register('cabin')}>
-                <option value="">La que esté disponible</option>
+              <select className={selCls} {...a} {...register('cabin')}>
+                <option value="">Cualquiera</option>
                 {cabins.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name} (hasta {c.capacity})
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+        </Field>
+        <Field label="¿Cómo preferís dormir?" error={errors.sleepingPreference?.message} light className="col-span-2 lg:col-span-1">
+          {(a) => (
+            <div className="relative">
+              <select className={selCls} disabled={!sleepingChoices.length} {...a} {...register('sleepingPreference')}>
+                <option value="">{sleepingChoices.length ? 'Me da igual' : 'Sin opciones'}</option>
+                {sleepingChoices.map((k) => (
+                  <option key={k} value={k}>
+                    {SLEEPING_OPTIONS[k]}
                   </option>
                 ))}
               </select>
@@ -114,7 +137,7 @@ export default function HeroSearch() {
           {(a) => (
             <div className="relative">
               <User className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-madera" aria-hidden="true" />
-              <input type="text" autoComplete="given-name" placeholder="¿Cómo te llamás?" className={inputCls} {...a} {...register('name')} />
+              <input type="text" autoComplete="given-name" placeholder="Tu nombre" className={inputCls} {...a} {...register('name')} />
             </div>
           )}
         </Field>
@@ -124,7 +147,7 @@ export default function HeroSearch() {
         <Controller
           name="pets"
           control={control}
-          render={({ field }) => <Toggle checked={field.value} onChange={field.onChange} label="¿Viajás con mascota? 🐾" light />}
+          render={({ field }) => <YesNoSelect value={field.value} onChange={field.onChange} label="¿Viajás con mascota? 🐾" light />}
         />
         <Magnetic className="w-full sm:w-auto">
           <button type="submit" disabled={sending} className="btn-sol w-full !py-3.5 sm:w-auto">
