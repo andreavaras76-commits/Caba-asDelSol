@@ -1,11 +1,14 @@
 import { useId, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Plus } from 'lucide-react';
+import { Plus, MessageCircle } from 'lucide-react';
+import { useSettingsStore } from '@/store/settingsStore';
+import { waLink } from '@/utils/whatsapp';
 import SectionHeading from '@/components/ui/SectionHeading';
 import Reveal from '@/components/ui/Reveal';
 
 /** Preguntas frecuentes: acordeón accesible (aria-expanded / aria-controls) */
 export default function Faq({ faqs = [] }) {
+  const { contact, businessName } = useSettingsStore((s) => s.settings);
   const [open, setOpen] = useState(0);
   const baseId = useId();
   if (!faqs.length) return null;
@@ -51,6 +54,16 @@ export default function Faq({ faqs = [] }) {
               </li>
             );
           })}
+        </Reveal>
+        <Reveal className="mt-10 text-center">
+          <a
+            href={waLink(contact.whatsapp, `¡Hola ${businessName}! 👋 Tengo una consulta:`)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-cerro"
+          >
+            <MessageCircle className="h-5 w-5" aria-hidden="true" /> ¿Tenés otra pregunta? Escribinos por WhatsApp
+          </a>
         </Reveal>
       </div>
     </section>
