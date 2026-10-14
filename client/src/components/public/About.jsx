@@ -70,7 +70,7 @@ export default function About({ cabinsCount = 0 }) {
             );
           })}
           <span className="pointer-events-none absolute -bottom-6 -left-4 rotate-[-6deg] font-script text-3xl text-tejido-ink" aria-hidden="true">
-            a 1 km de la Villa ☀
+            a 1,5 km de la Villa ☀
           </span>
         </div>
       </div>
