@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useCallback, useEffect, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
@@ -10,6 +10,8 @@ import {
   Images,
   Sparkles,
   Mountain,
+  MapPin,
+  PartyPopper,
   HelpCircle,
   Star,
   Users,
@@ -24,6 +26,7 @@ import {
 import SunLogo from '@/components/ui/SunLogo';
 import Seo from '@/components/ui/Seo';
 import { LoadingBlock } from '@/components/admin/ui';
+import AccountModal from '@/pages/admin/Account';
 import { useAuthStore } from '@/store/authStore';
 import { confirmAction } from '@/utils/notify';
 
@@ -44,6 +47,8 @@ const NAV = [
       { to: '/admin/galeria', label: 'Galería', icon: Images },
       { to: '/admin/servicios', label: 'Servicios', icon: Sparkles },
       { to: '/admin/atractivos', label: 'Atractivos de Tafí', icon: Mountain },
+      { to: '/admin/cerca', label: 'Todo cerca tuyo', icon: MapPin },
+      { to: '/admin/eventos-especiales', label: 'Eventos especiales', icon: PartyPopper },
       { to: '/admin/preguntas', label: 'Preguntas frecuentes', icon: HelpCircle },
       { to: '/admin/resenas', label: 'Reseñas', icon: Star },
     ],
@@ -67,6 +72,8 @@ const greeting = () => {
 export default function AdminLayout() {
   const { user, logout } = useAuthStore();
   const [open, setOpen] = useState(false);
+  const [account, setAccount] = useState(false);
+  const closeAccount = useCallback(() => setAccount(false), []);
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
@@ -113,9 +120,6 @@ export default function AdminLayout() {
         ))}
       </nav>
       <div className="shrink-0 space-y-0.5 border-t border-white/10 p-3">
-        <NavLink to="/admin/cuenta" className="flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-semibold text-crema/80 hover:bg-white/10 hover:text-crema">
-          <KeyRound className="h-[18px] w-[18px]" aria-hidden="true" /> Mi cuenta
-        </NavLink>
         <a href="/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-semibold text-crema/80 hover:bg-white/10 hover:text-crema">
           <ExternalLink className="h-[18px] w-[18px]" aria-hidden="true" /> Ver el sitio
         </a>
@@ -163,11 +167,21 @@ export default function AdminLayout() {
           <div className="flex items-center gap-3">
             <span className="hidden text-right text-sm leading-tight min-[380px]:block">
               <span className="block font-semibold">{user?.name}</span>
-              <span className="block text-xs text-carbon-light">Administración</span>
+              <button type="button" onClick={() => setAccount(true)} className="ml-auto inline-flex items-center gap-1 text-xs font-semibold text-tejido-ink underline-offset-2 hover:underline">
+                <KeyRound className="h-3.5 w-3.5" aria-hidden="true" /> Mi cuenta
+              </button>
             </span>
-            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-sol font-serif text-lg font-semibold text-carbon">{user?.name?.[0]}</span>
+            <button
+              type="button"
+              onClick={() => setAccount(true)}
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-sol font-serif text-lg font-semibold text-carbon transition hover:ring-4 hover:ring-sol/30"
+              aria-label="Mi cuenta"
+            >
+              {user?.name?.[0]}
+            </button>
           </div>
         </header>
+        <AccountModal open={account} onClose={closeAccount} />
         <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
           <Suspense fallback={<LoadingBlock />}>
             <Outlet />

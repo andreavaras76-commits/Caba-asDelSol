@@ -64,7 +64,7 @@ export const lodgingJsonLd = (settings, { cabins = [], reviews = [] } = {}) => {
     amenityFeature: ['WiFi gratis', 'TV satelital', 'Pileta', 'Quincho', 'Aire acondicionado', 'Desayuno', 'Lavandería', 'Estacionamiento'].map(
       (name) => ({ '@type': 'LocationFeatureSpecification', name, value: true })
     ),
-    sameAs: [settings.social?.instagram, settings.social?.threads, settings.social?.facebook].filter(Boolean),
+    sameAs: [settings.social?.instagram, settings.social?.facebook].filter(Boolean),
     containsPlace: cabins.map((c) => ({ '@type': 'Accommodation', name: c.name, occupancy: { '@type': 'QuantitativeValue', maxValue: c.capacity } })),
   };
   if (reviews.length) {
