@@ -1,6 +1,6 @@
 const { body } = require('express-validator');
 const { text, bool, int, number, arrayOf, mongoIdArray } = require('./common');
-const { AMENITIES, BED_TYPES, LIMITS } = require('../utils/constants');
+const { AMENITIES, BED_TYPES, BED_LOCATIONS, CABIN_TYPES, SLEEPING_OPTIONS, LIMITS } = require('../utils/constants');
 
 const cabin = (partial = false) => [
   text('name', { required: true, min: 2, max: LIMITS.NAME_MAX, label: 'El nombre', partial }),
@@ -16,6 +16,11 @@ const cabin = (partial = false) => [
   body('beds').optional().isArray({ max: 10 }).withMessage('Las camas deben ser una lista (máx. 10)'),
   body('beds.*.type').isIn(BED_TYPES).withMessage('Tipo de cama no válido'),
   body('beds.*.quantity').isInt({ min: 1, max: 10 }).withMessage('La cantidad de camas debe ser entre 1 y 10').toInt(),
+  body('beds.*.location').isIn(BED_LOCATIONS).withMessage('El ambiente de la cama no es válido'),
+  body('type').optional().isIn(CABIN_TYPES).withMessage('El tipo de cabaña no es válido'),
+  bool('privateBathroom', 'Baño privado'),
+  bool('electricWaterHeater', 'Termotanque eléctrico'),
+  ...arrayOf('sleepingOptions', SLEEPING_OPTIONS, 'Las opciones de cama'),
   ...arrayOf('amenities', AMENITIES, 'Los amenities'),
   number('price.amount', { min: 0, max: 100000000, label: 'El precio' }),
   bool('price.show', 'Mostrar precio'),
