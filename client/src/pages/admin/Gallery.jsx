@@ -17,6 +17,9 @@ import { confirmDelete, notifySuccess, notifyError, handleFormError } from '@/ut
 export default function Gallery() {
   const [tab, setTab] = useState('todas');
   const [uploadCategory, setUploadCategory] = useState('cabanas');
+  const [uploadCabin, setUploadCabin] = useState('');
+  const { data: cabins = [] } = useFetch('admin-cabins', () => adminApi.cabins.list().then((r) => r.data));
+  const cabinName = (id) => cabins.find((c) => c._id === (id?._id || id))?.name;
   const [uploading, setUploading] = useState(false);
   const [editing, setEditing] = useState(null);
   const { data, loading, reload } = useFetch('admin-gallery', () => adminApi.gallery.list().then((r) => r.data));
@@ -34,7 +37,7 @@ export default function Gallery() {
   const upload = async (files) => {
     setUploading(true);
     try {
-      const res = await adminApi.gallery.upload(files, uploadCategory);
+      const res = await adminApi.gallery.upload(files, uploadCategory, uploadCabin);
       notifySuccess(res.message);
       refresh();
     } catch (err) {
@@ -91,7 +94,16 @@ export default function Gallery() {
               <option key={k} value={k}>{v}</option>
             ))}
           </select>
+          {uploadCategory === 'cabanas' && (
+            <select className="input !w-auto" value={uploadCabin} onChange={(e) => setUploadCabin(e.target.value)} aria-label="De qué cabaña son las fotos">
+              <option value="">Cabañas en general</option>
+              {cabins.map((c) => (
+                <option key={c._id} value={c._id}>{c.name}</option>
+              ))}
+            </select>
+          )}
         </div>
+        <p className="-mt-2 mb-4 text-xs text-carbon-light">Las fotos de una cabaña arman su filtro en la galería del sitio (“Cabaña 1”, “Cabaña 2”…). También suman las fotos que subas desde la ficha de cada cabaña.</p>
         <ImageDropzone onFiles={upload} uploading={uploading} />
       </Card>
 
@@ -109,7 +121,7 @@ export default function Gallery() {
               <button type="button" {...handle} className="absolute left-2 top-2 cursor-grab rounded-full bg-white/90 p-1.5 shadow" aria-label="Mover foto">
                 <GripVertical className="h-4 w-4" />
               </button>
-              <Badge tone="gray" className="absolute right-2 top-2 !bg-white/90">{GALLERY_CATEGORIES[img.category]}</Badge>
+              <Badge tone="gray" className="absolute right-2 top-2 !bg-white/90">{(img.cabin && cabinName(img.cabin)) || GALLERY_CATEGORIES[img.category]}</Badge>
               <div className="flex justify-center gap-1 p-1.5">
                 <IconButton label={img.active ? 'Ocultar' : 'Mostrar'} onClick={() => toggle(img)}>
                   {img.active ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
@@ -126,23 +138,24 @@ export default function Gallery() {
         </Sortable>
       )}
 
-      <EditModal img={editing} onClose={() => setEditing(null)} onSaved={refresh} />
+      <EditModal img={editing} cabins={cabins} onClose={() => setEditing(null)} onSaved={refresh} />
     </>
   );
 }
 
-function EditModal({ img, onClose, onSaved }) {
+function EditModal({ img, cabins, onClose, onSaved }) {
   const {
     register,
     handleSubmit,
     control,
     setError,
     formState: { errors, isSubmitting },
-  } = useForm({ resolver: zodResolver(galleryUpdateSchema), values: img ? { alt: img.alt || '', category: img.category, active: img.active } : undefined });
+    watch,
+  } = useForm({ resolver: zodResolver(galleryUpdateSchema), values: img ? { alt: img.alt || '', category: img.category, cabin: img.cabin?._id || img.cabin || '', active: img.active } : undefined });
 
   const onSubmit = async (v) => {
     try {
-      await adminApi.gallery.update(img._id, v);
+      await adminApi.gallery.update(img._id, { ...v, cabin: v.category === 'cabanas' && v.cabin ? v.cabin : null });
       notifySuccess('Foto actualizada');
       onSaved();
       onClose();
@@ -168,6 +181,18 @@ function EditModal({ img, onClose, onSaved }) {
               </select>
             )}
           </Field>
+          {watch('category') === 'cabanas' && (
+            <Field label="Cabaña" error={errors.cabin?.message}>
+              {(a) => (
+                <select className="input" {...a} {...register('cabin')}>
+                  <option value="">Cabañas en general</option>
+                  {cabins.map((c) => (
+                    <option key={c._id} value={c._id}>{c.name}</option>
+                  ))}
+                </select>
+              )}
+            </Field>
+          )}
           <Controller name="active" control={control} render={({ field }) => <Toggle checked={field.value} onChange={field.onChange} label="Visible en el sitio" />} />
           <button type="submit" disabled={isSubmitting} className="btn-cerro w-full">Guardar</button>
         </form>
