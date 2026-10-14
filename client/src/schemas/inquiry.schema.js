@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { LIMITS } from '@/utils/constants';
+import { LIMITS, SLEEPING_OPTIONS, EVENT_MIN_HOURS } from '@/utils/constants';
 import { todayISO, overlapsBlocked } from '@/utils/format';
 
 /*
@@ -35,7 +35,7 @@ const guests = (max) =>
  * Consulta de estadía (hero, detalle de cabaña).
  * @param {{ maxGuests?: number, requireCabin?: boolean, blocked?: Array }} opts
  */
-export const makeStaySchema = ({ maxGuests = LIMITS.GUESTS_MAX, requireCabin = false, blocked = [] } = {}) =>
+export const makeStaySchema = ({ maxGuests = LIMITS.GUESTS_MAX, requireCabin = false, blocked = [], sleepingOptions = Object.keys(SLEEPING_OPTIONS) } = {}) =>
   z
     .object({
       name,
@@ -46,7 +46,12 @@ export const makeStaySchema = ({ maxGuests = LIMITS.GUESTS_MAX, requireCabin = f
       checkOut: isoDate('la fecha de salida'),
       guests: guests(maxGuests),
       pets: z.boolean().default(false),
+      sleepingPreference: z.enum(Object.keys(SLEEPING_OPTIONS)).optional().or(z.literal('')),
       comments,
+    })
+    .refine((d) => !d.sleepingPreference || sleepingOptions.includes(d.sleepingPreference), {
+      path: ['sleepingPreference'],
+      message: 'Esa opción de cama no está disponible en esta cabaña',
     })
     .refine((d) => d.checkIn >= todayISO(), { path: ['checkIn'], message: 'La fecha de entrada no puede ser pasada' })
     .refine((d) => d.checkOut > d.checkIn, { path: ['checkOut'], message: 'La salida debe ser posterior a la entrada' })
@@ -56,7 +61,7 @@ export const makeStaySchema = ({ maxGuests = LIMITS.GUESTS_MAX, requireCabin = f
     });
 
 /** Evento / día de campo */
-export const makeEventSchema = ({ capacity = LIMITS.GUESTS_MAX } = {}) =>
+export const makeEventSchema = ({ capacity = LIMITS.GUESTS_MAX, minHours = EVENT_MIN_HOURS } = {}) =>
   z
     .object({
       name,
@@ -68,6 +73,11 @@ export const makeEventSchema = ({ capacity = LIMITS.GUESTS_MAX } = {}) =>
         .int()
         .min(1, 'Tiene que haber al menos 1 persona')
         .max(capacity, `El predio recibe hasta ${capacity} personas`),
+      hours: z.coerce
+        .number({ invalid_type_error: 'Indicá cuántas horas' })
+        .int('Indicá horas enteras')
+        .min(minHours, `El mínimo es de ${minHours} horas`)
+        .max(24, 'Hasta 24 horas'),
       withLodging: z.boolean().default(false),
       comments,
     })

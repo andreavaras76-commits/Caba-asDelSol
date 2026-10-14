@@ -250,6 +250,19 @@ function FieldControl({ f, register, control, error }) {
       </Field>
     );
   }
+  if (f.type === 'select') {
+    return (
+      <Field label={f.label} hint={f.hint} error={error}>
+        {(a) => (
+          <select className="input" {...a} {...register(f.name)}>
+            {f.options.map(([value, label]) => (
+              <option key={value} value={value}>{label}</option>
+            ))}
+          </select>
+        )}
+      </Field>
+    );
+  }
   return (
     <Field label={f.label} hint={f.hint} error={error}>
       {(a) =>

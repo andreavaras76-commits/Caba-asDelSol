@@ -10,7 +10,7 @@ export const DEFAULT_SETTINGS = {
   location: 'Tafí del Valle',
   slogan: 'En las coordenadas ideales para disfrutar de la placidez y el esparcimiento en los Valles.',
   contact: { whatsapp: '5493815027738', phoneDisplay: '(0381) 15-502-7738', email: '', website: 'https://delsoltafidelvalle.com.ar' },
-  social: { instagram: 'https://www.instagram.com/delsolcabanas', threads: 'https://www.threads.net/@delsolcabanas', facebook: '' },
+  social: { instagram: 'https://www.instagram.com/delsolcabanas', facebook: '' },
   address: {
     street: 'Ruta 307 – Km 60, por calle Rosendo Contreras (al final)',
     city: 'Tafí del Valle',

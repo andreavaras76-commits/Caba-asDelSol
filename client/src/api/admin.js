@@ -40,9 +40,10 @@ export const adminApi = {
   },
   gallery: {
     list: (params) => api.get('/admin/gallery', { params }),
-    upload: (files, category) => {
+    upload: (files, category, cabin) => {
       const fd = form('images', files);
       fd.append('category', category);
+      if (category === 'cabanas' && cabin) fd.append('cabin', cabin);
       return api.post('/admin/gallery', fd, { timeout: 180000 });
     },
     update: (id, data) => api.put(`/admin/gallery/${id}`, data),
@@ -58,6 +59,12 @@ export const adminApi = {
   attractions: resource('attractions'),
   faqs: resource('faqs'),
   reviews: resource('reviews'),
+  feedback: {
+    list: (params) => api.get('/admin/feedback', { params }),
+    request: (client) => api.post('/admin/reviews/request', { client }),
+  },
+  nearbyPlaces: resource('nearby-places'),
+  specialEvents: resource('special-events'),
 
   clients: {
     ...resource('clients'),

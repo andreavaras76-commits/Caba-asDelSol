@@ -12,6 +12,10 @@ export const publicApi = {
   attractions: () => get('/attractions'),
   faqs: () => get('/faqs'),
   reviews: () => get('/reviews'),
+  nearbyPlaces: () => get('/nearby-places'),
+  specialEvents: () => get('/special-events'),
+  feedback: (token) => get(`/feedback/${token}`),
+  submitFeedback: (token, data) => api.post(`/feedback/${token}`, data),
   gallery: (category) => get('/gallery', category ? { category } : undefined),
   blockedDates: (cabin) => get('/blocked-dates', { cabin }),
   /** Devuelve { id, message, whatsappUrl } */

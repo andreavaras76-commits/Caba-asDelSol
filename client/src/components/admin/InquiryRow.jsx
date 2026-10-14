@@ -10,8 +10,8 @@ export function InquirySummary({ inquiry }) {
   const Icon = TYPE_ICON[inquiry.type] || MessageCircle;
   const stay =
     inquiry.type === 'evento'
-      ? [inquiry.eventType, inquiry.eventDate && formatDay(inquiry.eventDate), inquiry.people && `${inquiry.people} personas`, inquiry.withLodging && 'con hospedaje']
-      : [inquiry.checkIn && `${formatDay(inquiry.checkIn, { day: '2-digit', month: '2-digit' })} → ${formatDay(inquiry.checkOut, { day: '2-digit', month: '2-digit' })}`, inquiry.nights && `${inquiry.nights} noches`, inquiry.guests && `${inquiry.guests} huéspedes`];
+      ? [inquiry.eventType, inquiry.eventDate && formatDay(inquiry.eventDate), inquiry.people && `${inquiry.people} personas`, inquiry.hours && `${inquiry.hours} hs`, inquiry.withLodging && 'con hospedaje']
+      : [inquiry.checkIn && `${formatDay(inquiry.checkIn, { day: '2-digit', month: '2-digit' })} → ${formatDay(inquiry.checkOut, { day: '2-digit', month: '2-digit' })}`, inquiry.nights && `${inquiry.nights} noches`, inquiry.guests && `${inquiry.guests} huéspedes`, inquiry.sleepingPreference && `cama ${inquiry.sleepingPreference === 'matrimonial' ? 'matrimonial' : 'individuales'}`];
 
   return (
     <div className="flex min-w-0 items-start gap-3">

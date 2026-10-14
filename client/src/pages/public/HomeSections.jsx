@@ -30,6 +30,7 @@ export default function HomeSections() {
   const attractions = useFetch('attractions', publicApi.attractions);
   const reviews = useFetch('reviews', publicApi.reviews);
   const faqs = useFetch('faqs', publicApi.faqs);
+  const nearby = useFetch('nearby-places', publicApi.nearbyPlaces);
 
   return (
     <>
@@ -40,7 +41,7 @@ export default function HomeSections() {
       <Promotions onWant={setPromoToAsk} />
       <Events />
       <Gallery images={gallery.data || []} />
-      <Tafi attractions={attractions.data || []} />
+      <Tafi attractions={attractions.data || []} places={nearby.data || []} />
       <Reviews reviews={reviews.data || []} />
       <Location />
       <Faq faqs={faqs.data || []} />

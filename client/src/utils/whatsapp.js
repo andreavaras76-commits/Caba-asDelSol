@@ -1,5 +1,7 @@
 import { formatDay, nightsBetween } from './format';
 
+const SLEEPING_LABELS = { matrimonial: 'Matrimonial', individuales: 'Individuales' };
+
 /**
  * Misma plantilla que server/src/utils/whatsapp.js.
  * El mensaje "oficial" lo arma el backend; esta copia se usa sólo si la API no responde,
@@ -13,6 +15,7 @@ export function buildInquiryMessage(inq, businessName = 'Cabañas del Sol') {
     if (inq.eventType) lines.push(`🎉 Evento: ${inq.eventType}`);
     if (inq.eventDate) lines.push(`📅 Fecha: ${formatDay(inq.eventDate)}`);
     if (inq.people) lines.push(`👥 Personas: ${inq.people}`);
+    if (inq.hours) lines.push(`⏱️ Duración: ${inq.hours} horas`);
     lines.push(`🛏️ Con hospedaje: ${inq.withLodging ? 'Sí' : 'No'}`);
   } else {
     lines.push(`¡Hola ${businessName}! 👋 Quiero consultar disponibilidad:`);
@@ -22,6 +25,7 @@ export function buildInquiryMessage(inq, businessName = 'Cabañas del Sol') {
       lines.push(`📅 Entrada: ${formatDay(inq.checkIn)} · Salida: ${formatDay(inq.checkOut)} (${n} ${n === 1 ? 'noche' : 'noches'})`);
     }
     if (inq.guests) lines.push(`👥 Huéspedes: ${inq.guests}`);
+    if (inq.sleepingPreference) lines.push(`🛏️ Preferencia de cama: ${SLEEPING_LABELS[inq.sleepingPreference] || inq.sleepingPreference}`);
     lines.push(`🐾 Mascota: ${inq.pets ? 'Sí' : 'No'}`);
   }
 
@@ -31,8 +35,9 @@ export function buildInquiryMessage(inq, businessName = 'Cabañas del Sol') {
   return lines.join('\n');
 }
 
+/** api.whatsapp.com/send en vez de wa.me: el redireccionamiento de wa.me rompe los emojis en WhatsApp Web */
 export const waLink = (phone, text = '') =>
-  `https://wa.me/${String(phone).replace(/\D/g, '')}${text ? `?text=${encodeURIComponent(text)}` : ''}`;
+  `https://api.whatsapp.com/send?phone=${String(phone).replace(/\D/g, '')}${text ? `&text=${encodeURIComponent(text)}` : ''}`;
 
 /**
  * Normaliza un teléfono argentino a formato wa.me (549 + área + número).

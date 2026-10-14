@@ -1,6 +1,6 @@
 const { body } = require('express-validator');
 const { text, bool, int, date, oneOf, url, mongoIdArray } = require('./common');
-const { GALLERY_CATEGORIES, LIMITS } = require('../utils/constants');
+const { GALLERY_CATEGORIES, NEARBY_CATEGORIES, SERVICE_GROUPS, LIMITS } = require('../utils/constants');
 
 /** Validaciones de los CRUD "simples": servicios, atractivos, FAQ, reseñas, galería y fechas bloqueadas */
 
@@ -11,6 +11,7 @@ const service = (partial = false) => [
   text('icon', { required: true, min: 2, max: 40, label: 'El ícono', partial }),
   body('icon').optional().matches(/^[A-Za-z0-9]+$/).withMessage('El ícono debe ser un nombre de Lucide (ej: Wifi)'),
   text('description', { max: LIMITS.SHORT_TEXT_MAX, label: 'La descripción' }),
+  oneOf('group', SERVICE_GROUPS, { label: 'El tipo' }),
   ...common,
 ];
 
@@ -38,17 +39,53 @@ const review = (partial = false) => [
   ...common,
 ];
 
-const galleryUpload = [oneOf('category', GALLERY_CATEGORIES, { required: true, label: 'La categoría' })];
+const galleryCabin = body('cabin').optional({ values: 'falsy' }).isMongoId().withMessage('Cabaña inválida');
+const galleryUpload = [oneOf('category', GALLERY_CATEGORIES, { required: true, label: 'La categoría' }), galleryCabin];
 
 const galleryUpdate = [
   text('alt', { max: 160, label: 'El texto alternativo' }),
   oneOf('category', GALLERY_CATEGORIES, { label: 'La categoría' }),
+  galleryCabin,
   ...common,
 ];
+
+/** Opinión del huésped (página pública /opinar/:token) */
+const feedbackSubmit = [
+  body('rating').exists({ values: 'falsy' }).withMessage('Elegí una puntuación').bail().isInt({ min: 1, max: 5 }).withMessage('La puntuación va de 1 a 5').toInt(),
+  text('text', { max: 1500, label: 'El comentario' }),
+  text('origin', { max: 80, label: 'De dónde nos visitás' }),
+];
+const feedbackRequest = [body('client').exists({ values: 'falsy' }).withMessage('Falta el cliente').bail().isMongoId().withMessage('Cliente inválido')];
 
 const reorder = [
   body('ids').exists().withMessage('Enviá el nuevo orden').bail().isArray({ min: 1 }).withMessage('El orden debe ser una lista'),
   ...mongoIdArray('ids', 'El orden'),
+];
+
+/** Teléfono libre (fijo o celular): dígitos, espacios, +, -, paréntesis */
+const phone = (field, label) =>
+  body(field).optional({ values: 'falsy' }).matches(/^[\d\s()+-]{6,25}$/).withMessage(`${label} no es válido`);
+
+const nearbyPlace = (partial = false) => [
+  text('name', { required: true, min: 2, max: LIMITS.NAME_MAX, label: 'El nombre', partial }),
+  oneOf('category', NEARBY_CATEGORIES, { required: true, label: 'La categoría', partial }),
+  text('description', { max: LIMITS.SHORT_TEXT_MAX, label: 'La descripción' }),
+  phone('phone', 'El teléfono'),
+  body('whatsapp')
+    .optional({ values: 'falsy' })
+    .customSanitizer((v) => String(v).replace(/\D/g, ''))
+    .matches(/^\d{10,15}$/)
+    .withMessage('El WhatsApp debe tener entre 10 y 15 dígitos, con código de país (ej: 5493815027738)'),
+  text('address', { max: 160, label: 'La dirección' }),
+  url('mapsUrl', 'El link de Maps'),
+  ...common,
+];
+
+const specialEvent = (partial = false) => [
+  text('title', { required: true, min: 3, max: LIMITS.TITLE_MAX, label: 'El título', partial }),
+  text('description', { max: 1000, label: 'La descripción' }),
+  date('date', { label: 'La fecha' }),
+  ...common,
 ];
 
 const blockedDate = [
@@ -68,6 +105,9 @@ module.exports = {
   faq: { create: faq(false), update: faq(true) },
   review: { create: review(false), update: review(true) },
   gallery: { upload: galleryUpload, update: galleryUpdate },
+  nearbyPlace: { create: nearbyPlace(false), update: nearbyPlace(true) },
+  specialEvent: { create: specialEvent(false), update: specialEvent(true) },
   reorder,
+  feedback: { submit: feedbackSubmit, request: feedbackRequest },
   blockedDate,
 };

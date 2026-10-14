@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Plus, Search, Pencil, Trash2, MessageCircle, Users } from 'lucide-react';
+import { Plus, Search, Pencil, Trash2, MessageCircle, Users, Star, MessageSquareHeart } from 'lucide-react';
+import { useSettingsStore } from '@/store/settingsStore';
+import { requestFeedback } from '@/utils/feedback';
 import { PageHeader, Card, LoadingBlock, EmptyState, IconButton, Badge } from '@/components/admin/ui';
 import Chips from '@/components/admin/Chips';
 import Modal from '@/components/ui/Modal';
@@ -12,7 +14,7 @@ import { clientSchema } from '@/schemas/admin.schema';
 import { CLIENT_TAGS } from '@/utils/constants';
 import { formatDay, isoToInputUTC } from '@/utils/format';
 import { waLink, normalizeArPhone } from '@/utils/whatsapp';
-import { confirmDelete, notifySuccess, notifyError, handleFormError } from '@/utils/notify';
+import { confirmDelete, notifySuccess, toastSuccess, notifyError, handleFormError } from '@/utils/notify';
 
 const tagOptions = Object.entries(CLIENT_TAGS).map(([value, label]) => ({ value, label }));
 const TAG_TONES = { familia: 'blue', pareja: 'orange', eventos: 'yellow', mascota: 'green' };
@@ -33,6 +35,17 @@ export default function Clients() {
   const refresh = () => {
     clearFetchCache(key);
     reload();
+  };
+
+  const businessName = useSettingsStore((s) => s.settings.businessName);
+  const askFeedback = async (c) => {
+    try {
+      await requestFeedback(c, businessName);
+      toastSuccess(`Pedido de opinión enviado a ${c.name.split(' ')[0]}`);
+      refresh();
+    } catch (err) {
+      notifyError(err);
+    }
   };
 
   const remove = async (c) => {
@@ -102,6 +115,23 @@ export default function Clients() {
                     {[c.cabin?.name && `🏡 ${c.cabin.name}`, c.lastStay && `Última estadía: ${formatDay(c.lastStay, { day: 'numeric', month: 'short', year: 'numeric' })}`, c.promotionsSent.length && `${c.promotionsSent.length} promos enviadas`].filter(Boolean).join(' · ')}
                   </p>
                   {c.notes && <p className="mt-2 line-clamp-2 rounded-xl bg-crema p-2 text-sm">📝 {c.notes}</p>}
+                  <div className="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-crema-dark pt-3">
+                    <span className="text-xs text-carbon-light">
+                      {c.lastRating ? (
+                        <span className="inline-flex items-center gap-1 font-semibold text-carbon">
+                          <Star className="h-3.5 w-3.5 fill-sol text-sol" aria-hidden="true" /> {c.lastRating}/5
+                          <span className="font-normal text-carbon-light">· opinó el {formatDay(c.lastFeedbackAt, { day: 'numeric', month: 'short' })}</span>
+                        </span>
+                      ) : c.feedbackRequestedAt ? (
+                        `Opinión pedida el ${formatDay(c.feedbackRequestedAt, { day: 'numeric', month: 'short' })}`
+                      ) : (
+                        'Sin opinión todavía'
+                      )}
+                    </span>
+                    <button type="button" onClick={() => askFeedback(c)} className="btn !px-3 !py-1.5 bg-sol-100 text-sm text-madera hover:bg-sol-200">
+                      <MessageSquareHeart className="h-4 w-4" aria-hidden="true" /> {c.feedbackRequestedAt && !c.lastRating ? 'Volver a pedir' : 'Pedir opinión'}
+                    </button>
+                  </div>
                 </Card>
               </li>
             ))}

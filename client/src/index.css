@@ -3,6 +3,20 @@
 @tailwind utilities;
 
 @layer base {
+  /* Celulares chicos (iPhone SE): las columnas de una grilla pueden achicarse en vez de empujar el contenido fuera de la pantalla */
+  .grid > * {
+    min-width: 0;
+  }
+  /* iOS les da un ancho mínimo propio a los campos de fecha */
+  input[type="date"],
+  input[type="time"] {
+    min-width: 0;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  input[type="date"]::-webkit-date-and-time-value {
+    text-align: left;
+  }
   /* Sin scroll lateral en toda la página (`clip` no rompe los elementos sticky/fixed como `hidden`) */
   html,
   body {

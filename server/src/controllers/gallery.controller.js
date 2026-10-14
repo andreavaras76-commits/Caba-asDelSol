@@ -1,4 +1,5 @@
 const GalleryImage = require('../models/GalleryImage');
+const Cabin = require('../models/Cabin');
 const ApiError = require('../utils/ApiError');
 const asyncHandler = require('../utils/asyncHandler');
 const { success, created } = require('../utils/response');
@@ -7,10 +8,32 @@ const { uploadMany, destroyImage } = require('../utils/cloudinaryUpload');
 
 const SORT = { order: 1, createdAt: -1 };
 
+/**
+ * Público: fotos de la galería + las fotos de cada cabaña activa.
+ * Cada foto trae `cabin` ({ _id, name, slug }) si pertenece a una cabaña, así el front arma
+ * los filtros "Cabaña 1", "Cabaña 2"… sólo para las cabañas que tienen fotos.
+ */
 exports.listPublic = asyncHandler(async (req, res) => {
-  const filter = { active: true };
-  if (req.query.category) filter.category = req.query.category;
-  success(res, await GalleryImage.find(filter).sort(SORT));
+  const [gallery, cabins] = await Promise.all([
+    GalleryImage.find({ active: true }).sort(SORT).populate('cabin', 'name slug active order').lean(),
+    Cabin.find({ active: true, 'images.0': { $exists: true } }).select('name slug images order').sort({ order: 1 }).lean(),
+  ]);
+  const fromGallery = gallery
+    .filter((img) => !img.cabin || img.cabin.active)
+    .map((img) => ({ ...img, cabin: img.cabin ? { _id: img.cabin._id, name: img.cabin.name, slug: img.cabin.slug, order: img.cabin.order } : null }));
+  const fromCabins = cabins.flatMap((c) =>
+    c.images.map((img) => ({
+      _id: img._id,
+      url: img.url,
+      width: img.width,
+      height: img.height,
+      alt: img.alt || c.name,
+      category: 'cabanas',
+      cabin: { _id: c._id, name: c.name, slug: c.slug, order: c.order },
+      source: 'cabin',
+    }))
+  );
+  success(res, [...fromGallery, ...fromCabins]);
 });
 
 exports.listAll = asyncHandler(async (req, res) => {
@@ -21,10 +44,11 @@ exports.listAll = asyncHandler(async (req, res) => {
 /** Subida múltiple: todas las fotos del lote quedan en la misma categoría */
 exports.upload = asyncHandler(async (req, res) => {
   const { category } = req.body;
+  const cabin = category === 'cabanas' && req.body.cabin ? req.body.cabin : null;
   const start = await GalleryImage.countDocuments();
   const uploaded = await uploadMany(req.files, `galeria/${category}`);
   const docs = await GalleryImage.insertMany(
-    uploaded.map((img, i) => ({ ...img, category, order: start + i, alt: `Cabañas del Sol, Tafí del Valle — ${category}` }))
+    uploaded.map((img, i) => ({ ...img, category, cabin, order: start + i, alt: `Cabañas del Sol, Tafí del Valle — ${category}` }))
   );
   created(res, docs, `${docs.length} ${docs.length === 1 ? 'foto subida' : 'fotos subidas'}`);
 });

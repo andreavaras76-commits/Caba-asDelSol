@@ -1,6 +1,6 @@
 const { Schema, model } = require('mongoose');
 const Image = require('./schemas/Image');
-const { AMENITIES, BED_TYPES } = require('../utils/constants');
+const { AMENITIES, BED_TYPES, BED_LOCATIONS, CABIN_TYPES, SLEEPING_OPTIONS } = require('../utils/constants');
 
 const cabinSchema = new Schema(
   {
@@ -8,6 +8,7 @@ const cabinSchema = new Schema(
     slug: { type: String, required: true, unique: true, lowercase: true, trim: true },
     shortDescription: { type: String, trim: true, default: '' },
     description: { type: String, trim: true, default: '' },
+    type: { type: String, enum: CABIN_TYPES, default: 'dormitorio' }, // dormitorio + cocina comedor, o monoambiente
     capacity: { type: Number, required: true, min: 1 },
     rooms: { type: Number, default: 1, min: 1 }, // ambientes
     bathrooms: { type: Number, default: 1, min: 0 },
@@ -16,8 +17,13 @@ const cabinSchema = new Schema(
         _id: false,
         type: { type: String, enum: BED_TYPES, required: true },
         quantity: { type: Number, min: 1, default: 1 },
+        location: { type: String, enum: BED_LOCATIONS, default: 'dormitorio' }, // en qué ambiente está
       },
     ],
+    // Todo es individual en cada cabaña: sólo los espacios comunes del complejo se comparten
+    privateBathroom: { type: Boolean, default: true },
+    electricWaterHeater: { type: Boolean, default: true },
+    sleepingOptions: [{ type: String, enum: SLEEPING_OPTIONS }], // opciones que se ofrecen al consultar
     amenities: [{ type: String, enum: AMENITIES }],
     price: {
       amount: { type: Number, min: 0, default: null }, // precio de referencia por noche

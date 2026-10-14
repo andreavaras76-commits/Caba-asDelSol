@@ -23,6 +23,7 @@ const c = {
   gallery: require('../controllers/gallery.controller'),
   blocked: require('../controllers/blockedDate.controller'),
   seo: require('../controllers/seo.controller'),
+  feedback: require('../controllers/feedback.controller'),
 };
 const crudFactory = require('../controllers/crudFactory');
 const crud = {
@@ -30,6 +31,8 @@ const crud = {
   attractions: crudFactory(require('../models/Attraction'), { label: 'Atractivo', folder: 'atractivos' }),
   faqs: crudFactory(require('../models/Faq'), { label: 'Pregunta' }),
   reviews: crudFactory(require('../models/Review'), { label: 'Reseña', sort: { order: 1, date: -1, createdAt: -1 } }),
+  'nearby-places': crudFactory(require('../models/NearbyPlace'), { label: 'Lugar', folder: 'cerca', sort: { category: 1, order: 1, createdAt: 1 } }),
+  'special-events': crudFactory(require('../models/SpecialEvent'), { label: 'Evento especial', folder: 'eventos-especiales', sort: { order: 1, date: 1 } }),
 };
 
 const router = Router();
@@ -52,6 +55,9 @@ router.get('/promotions', publicLimiter, c.promos.listPublic);
 router.get('/gallery', publicLimiter, c.gallery.listPublic);
 router.get('/blocked-dates', publicLimiter, c.blocked.listPublic);
 router.post('/inquiries', inquiryLimiter, validate(v.inquiry.create), c.inquiries.create);
+// Opinión del huésped por link personal (enviado por WhatsApp desde el panel)
+router.get('/feedback/:token', publicLimiter, c.feedback.show);
+router.post('/feedback/:token', inquiryLimiter, validate(v.content.feedback.submit), c.feedback.submit);
 Object.entries(crud).forEach(([path, ctrl]) => router.get(`/${path}`, publicLimiter, ctrl.listPublic));
 
 /* =========================== ADMIN ============================ */
@@ -94,7 +100,14 @@ router.post('/admin/blocked-dates', admin, validate(v.content.blockedDate), c.bl
 router.delete('/admin/blocked-dates/:id', admin, id, c.blocked.remove);
 
 // Servicios, atractivos, FAQ y reseñas (CRUD genérico)
-const crudValidators = { services: v.content.service, attractions: v.content.attraction, faqs: v.content.faq, reviews: v.content.review };
+const crudValidators = {
+  services: v.content.service,
+  attractions: v.content.attraction,
+  faqs: v.content.faq,
+  reviews: v.content.review,
+  'nearby-places': v.content.nearbyPlace,
+  'special-events': v.content.specialEvent,
+};
 Object.entries(crud).forEach(([path, ctrl]) => {
   const base = `/admin/${path}`;
   router.get(base, admin, ctrl.listAll);
@@ -111,6 +124,8 @@ Object.entries(crud).forEach(([path, ctrl]) => {
 
 /* ============ CLIENTES, ENVÍO DE PROMOS Y CONFIGURACIÓN ============ */
 // Clientes
+router.post('/admin/reviews/request', admin, validate(v.content.feedback.request), c.feedback.request);
+router.get('/admin/feedback', admin, c.feedback.list);
 router.get('/admin/clients', admin, c.clients.list);
 router.post('/admin/clients', admin, validate(v.client.create), c.clients.create);
 router.post('/admin/clients/from-inquiry/:inquiryId', admin, validate([mongoIdParam('inquiryId')]), c.clients.fromInquiry);

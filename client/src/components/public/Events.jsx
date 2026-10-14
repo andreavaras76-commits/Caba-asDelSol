@@ -1,16 +1,35 @@
 import { motion } from 'framer-motion';
-import { Check, BedDouble } from 'lucide-react';
+import { Users, BedDouble, Clock, Hourglass, Sparkles, MessageCircle, CalendarDays } from 'lucide-react';
 import Reveal, { staggerContainer, fadeUp } from '@/components/ui/Reveal';
 import Counter from '@/components/ui/Counter';
 import CldImage from '@/components/ui/CldImage';
 import MountainDivider from '@/components/ui/MountainDivider';
 import EventForm from './EventForm';
+import useFetch from '@/hooks/useFetch';
+import { publicApi } from '@/api/public';
 import { useSettingsStore } from '@/store/settingsStore';
+import { getIcon } from '@/utils/icons';
+import { waLink } from '@/utils/whatsapp';
+import { formatDayLong } from '@/utils/format';
+import { EVENT_MIN_HOURS } from '@/utils/constants';
+
+/** Normaliza los ítems de "Incluye" (soporta el formato viejo de sólo texto) */
+const normalizeIncludes = (list = []) => list.map((i) => (typeof i === 'string' ? { label: i, icon: 'Sparkles', badge: '' } : i));
 
 /** Eventos y días de campo: fondo madera cálido con textura tejida */
 export default function Events() {
-  const { events } = useSettingsStore((s) => s.settings);
+  const { events, contact, businessName } = useSettingsStore((s) => s.settings);
+  const { data: specials = [] } = useFetch('special-events', publicApi.specialEvents);
   const images = events.images || [];
+  const includes = normalizeIncludes(events.includes);
+  const minHours = events.minHours || EVENT_MIN_HOURS;
+
+  const conditions = [
+    { Icon: Users, label: 'Capacidad', value: `Hasta ${events.capacity || 30} personas` },
+    { Icon: Hourglass, label: 'Mínimo', value: `${minHours} horas` },
+    { Icon: Clock, label: 'Horarios', value: events.schedule || 'A consultar' },
+    ...(events.lodgingOptional ? [{ Icon: BedDouble, label: 'Hospedaje', value: 'Opcional' }] : []),
+  ];
 
   return (
     <section id="eventos" className="relative overflow-hidden bg-madera-dark text-crema">
@@ -18,7 +37,7 @@ export default function Events() {
       <div className="textura-tejido absolute inset-0 opacity-60" aria-hidden="true" />
       <div className="pointer-events-none absolute -left-32 top-1/3 h-96 w-96 rounded-full bg-tejido/25 blur-3xl" aria-hidden="true" />
 
-      <div className="container-sol relative grid gap-12 py-16 sm:py-24 lg:grid-cols-[1.05fr_1fr] lg:items-center">
+      <div className="container-sol relative grid gap-12 py-16 sm:py-24 lg:grid-cols-[1.05fr_1fr] lg:items-start">
         <div>
           <Reveal>
             <p className="font-script text-3xl text-sol-200">Cumpleaños, juntadas y asados</p>
@@ -26,34 +45,45 @@ export default function Events() {
             <p className="mt-5 max-w-xl whitespace-pre-line text-lg text-crema/85">{events.text}</p>
           </Reveal>
 
-          <Reveal delay={0.1} className="mt-8 flex flex-wrap items-end gap-6">
-            <div>
-              <span className="block text-sm font-semibold uppercase tracking-widest text-crema/70">Hasta</span>
-              <Counter value={events.capacity || 30} className="font-serif text-7xl font-semibold leading-none text-sol" />
-              <span className="block font-script text-2xl text-sol-200">personas</span>
-            </div>
-            {events.lodgingOptional && (
-              <span className="glass inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold">
-                <BedDouble className="h-4 w-4" aria-hidden="true" /> Hospedaje opcional
-              </span>
-            )}
+          {/* Condiciones */}
+          <Reveal delay={0.1} className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {conditions.map(({ Icon, label, value }) => (
+              <div key={label} className="rounded-3xl bg-crema/10 p-4 ring-1 ring-crema/15">
+                <Icon className="h-5 w-5 text-sol" aria-hidden="true" />
+                <p className="mt-2 text-xs font-bold uppercase tracking-wider text-crema/60">{label}</p>
+                <p className="font-serif text-lg font-semibold leading-tight">{value}</p>
+              </div>
+            ))}
           </Reveal>
 
-          {events.includes?.length > 0 && (
-            <motion.ul
-              className="mt-8 flex flex-wrap gap-2"
-              variants={staggerContainer(0.05)}
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: true }}
-              aria-label="Qué incluye"
-            >
-              {events.includes.map((inc) => (
-                <motion.li key={inc} variants={fadeUp} className="inline-flex items-center gap-1.5 rounded-full bg-crema/10 px-4 py-2 font-semibold ring-1 ring-crema/20">
-                  <Check className="h-4 w-4 text-sol" aria-hidden="true" /> {inc}
-                </motion.li>
-              ))}
-            </motion.ul>
+          {/* Qué incluye */}
+          {includes.length > 0 && (
+            <>
+              <p className="mt-10 font-script text-2xl text-sol-200">Incluye</p>
+              <motion.ul
+                className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3"
+                variants={staggerContainer(0.04)}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true, margin: '-40px' }}
+                aria-label="Qué incluye"
+              >
+                {includes.map((inc) => {
+                  const Icon = getIcon(inc.icon);
+                  return (
+                    <motion.li key={inc.label} variants={fadeUp} className="flex items-center gap-2.5 rounded-2xl bg-crema/10 px-3 py-2.5 ring-1 ring-crema/15">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-sol text-carbon">
+                        <Icon className="h-5 w-5" aria-hidden="true" />
+                      </span>
+                      <span className="min-w-0 font-semibold leading-tight">
+                        {inc.label}
+                        {inc.badge && <span className="mt-0.5 block w-fit rounded-full bg-cielo px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">{inc.badge}</span>}
+                      </span>
+                    </motion.li>
+                  );
+                })}
+              </motion.ul>
+            </>
           )}
 
           {images.length > 0 && (
@@ -67,11 +97,82 @@ export default function Events() {
           )}
         </div>
 
-        <Reveal delay={0.15}>
-          <EventForm capacity={events.capacity || 30} lodgingOptional={events.lodgingOptional} />
+        <Reveal delay={0.15} className="lg:sticky lg:top-24">
+          <EventForm capacity={events.capacity || 30} lodgingOptional={events.lodgingOptional} minHours={minHours} />
         </Reveal>
       </div>
+
+      {/* Eventos especiales de temporada (Navidad, Año Nuevo…) */}
+      {specials.length > 0 && (
+        <div className="container-sol relative pb-16 sm:pb-24">
+          <Reveal className="mb-6 flex items-center gap-3">
+            <Sparkles className="h-6 w-6 text-sol" aria-hidden="true" />
+            <h3 className="font-serif text-3xl font-semibold">Fiestas de temporada</h3>
+          </Reveal>
+          <motion.ul className="grid gap-5 md:grid-cols-2" variants={staggerContainer(0.1)} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-40px' }}>
+            {specials.map((ev, i) => (
+              <motion.li key={ev._id} variants={fadeUp}>
+                <SpecialEventCard ev={ev} index={i} whatsapp={contact.whatsapp} businessName={businessName} />
+              </motion.li>
+            ))}
+          </motion.ul>
+        </div>
+      )}
       <MountainDivider from="transparent" to="#FBF6EC" accent="#E8893A" className="relative" />
     </section>
+  );
+}
+
+const FESTIVE = ['from-cerro-profundo via-cerro-noche to-[#0f2416]', 'from-cielo-800 via-[#1b2f55] to-cerro-noche'];
+
+function SpecialEventCard({ ev, index, whatsapp, businessName }) {
+  const msg = `¡Hola ${businessName}! 👋 Quiero consultar por la ${ev.title}${ev.date ? ` (${formatDayLong(ev.date)})` : ''}.`;
+  return (
+    <article className={`group relative flex h-full flex-col overflow-hidden rounded-4xl bg-gradient-to-br ${FESTIVE[index % FESTIVE.length]} shadow-calida-lg ring-1 ring-sol/30`}>
+      {ev.image?.url ? (
+        <CldImage src={ev.image.url} alt={ev.image.alt || ev.title} width={900} sizes="(max-width: 768px) 100vw, 50vw" className="aspect-[16/9]" imgClassName="transition-transform duration-[1.2s] group-hover:scale-105" />
+      ) : (
+        <Garland />
+      )}
+      <div className="relative flex flex-1 flex-col p-6 sm:p-7">
+        <p className="font-script text-2xl text-sol-200">Evento especial</p>
+        <h4 className="font-serif text-3xl font-semibold leading-tight">{ev.title}</h4>
+        {ev.date && (
+          <p className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-sol">
+            <CalendarDays className="h-4 w-4" aria-hidden="true" /> {formatDayLong(ev.date)}
+          </p>
+        )}
+        {ev.description && <p className="mt-3 text-crema/85">{ev.description}</p>}
+        <a href={waLink(whatsapp, msg)} target="_blank" rel="noopener noreferrer" className="btn-sol mt-6 w-full sm:mt-auto sm:w-fit">
+          <MessageCircle className="h-5 w-5" aria-hidden="true" /> Consultar por WhatsApp
+        </a>
+      </div>
+    </article>
+  );
+}
+
+/** Guirnalda de luces (cuando el evento todavía no tiene foto) */
+function Garland() {
+  const colors = ['#F6B23C', '#F2C230', '#E8893A', '#FBF6EC'];
+  return (
+    <svg viewBox="0 0 400 90" className="h-24 w-full" aria-hidden="true">
+      <path d="M0 18 Q100 60 200 22 T400 20" fill="none" stroke="#FBF6EC" strokeOpacity="0.35" strokeWidth="1.5" />
+      {Array.from({ length: 14 }, (_, i) => {
+        const x = 14 + i * 28;
+        const y = 22 + Math.sin((x / 400) * Math.PI * 2) * -14 + (x < 200 ? (x / 200) * 18 : ((400 - x) / 200) * 14);
+        return (
+          <motion.circle
+            key={i}
+            cx={x}
+            cy={y + 8}
+            r="5"
+            fill={colors[i % colors.length]}
+            initial={{ opacity: 0.4 }}
+            animate={{ opacity: [0.4, 1, 0.4] }}
+            transition={{ duration: 2.4, repeat: Infinity, delay: (i % 4) * 0.5 }}
+          />
+        );
+      })}
+    </svg>
   );
 }

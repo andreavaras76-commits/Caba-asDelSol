@@ -23,7 +23,14 @@ export const confirmAction = async (title, text, confirmButtonText = 'Confirmar'
   return isConfirmed;
 };
 
-export const notifySuccess = (title) => toast.fire({ icon: 'success', titleText: title });
+/** Guardados y eliminaciones: aviso centrado que se cierra solo */
+export const notifySuccess = (title, text) =>
+  Swal.fire({ icon: 'success', titleText: title, text, showConfirmButton: false, timer: 1700, timerProgressBar: true });
+
+/** Avisos chicos (esquina): login, link copiado, orden guardado… */
+export const toastSuccess = (title) => toast.fire({ icon: 'success', titleText: title });
+export const toastError = (title, text) => toast.fire({ icon: 'error', titleText: title, text, timer: 4000 });
+export const toastWarning = (title) => toast.fire({ icon: 'warning', titleText: title });
 
 export const notifyError = (err, title = 'No se pudo completar') =>
   Swal.fire({

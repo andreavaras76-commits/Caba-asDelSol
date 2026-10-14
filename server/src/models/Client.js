@@ -7,6 +7,10 @@ const clientSchema = new Schema(
     phone: { type: String, required: true, trim: true }, // WhatsApp, sólo dígitos con código de país
     cabin: { type: Schema.Types.ObjectId, ref: 'Cabin', default: null },
     lastStay: { type: Date, default: null },
+    // Seguimiento de opiniones
+    feedbackRequestedAt: { type: Date, default: null },
+    lastFeedbackAt: { type: Date, default: null },
+    lastRating: { type: Number, min: 1, max: 5, default: null },
     notes: { type: String, trim: true, default: '' },
     tags: [{ type: String, enum: CLIENT_TAGS }],
     // Promos ya enviadas a este cliente (para no repetir)

@@ -7,7 +7,7 @@ import CldImage from '@/components/ui/CldImage';
 import CabinIllustration from '@/components/illustrations/CabinIllustration';
 import useFetch, { clearFetchCache } from '@/hooks/useFetch';
 import { adminApi } from '@/api/admin';
-import { confirmDelete, notifySuccess, notifyError } from '@/utils/notify';
+import { confirmDelete, notifySuccess, toastSuccess, notifyError } from '@/utils/notify';
 import { formatPrice } from '@/utils/format';
 
 export default function Cabins() {
@@ -26,7 +26,7 @@ export default function Cabins() {
     try {
       // Pocas cabañas: actualizamos sólo las que cambiaron de posición
       await Promise.all(next.map((c, order) => (c.order !== order ? adminApi.cabins.update(c._id, { order }) : null)));
-      notifySuccess('Orden guardado');
+      toastSuccess('Orden guardado');
       refresh();
     } catch (err) {
       notifyError(err);

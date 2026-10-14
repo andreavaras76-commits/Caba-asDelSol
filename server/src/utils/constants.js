@@ -22,8 +22,16 @@ module.exports = {
     'estacionamiento',
     'vista_cerro',
     'galeria',
+    'pava',
   ],
-  BED_TYPES: ['matrimonial', 'single', 'cucheta', 'sofa_cama'],
+  SERVICE_GROUPS: ['servicio', 'espacio'], // servicio del complejo / espacio común del predio
+  BED_TYPES: ['matrimonial', 'individual', 'marinera', 'divan_cama'],
+  BED_LOCATIONS: ['dormitorio', 'cocina_comedor', 'monoambiente'],
+  CABIN_TYPES: ['dormitorio', 'monoambiente'],
+  SLEEPING_OPTIONS: ['matrimonial', 'individuales'], // lo que el huésped elige al consultar
+  NEARBY_CATEGORIES: ['delivery', 'supermercado', 'estacion_servicio', 'carniceria', 'panaderia', 'tortas', 'paseos'],
+  EVENT_TYPES: ['Cumpleaños', 'Juntada', 'Navidad', 'Año Nuevo', 'Otro'],
+  EVENT_MIN_HOURS: 3,
 
   PROMO_TYPES: ['porcentaje', 'precio_especial', 'noche_gratis', 'texto'],
   SEASONS: ['verano', 'invierno', 'fines_largos', 'todo_el_anio'],
@@ -33,7 +41,7 @@ module.exports = {
 
   CLIENT_TAGS: ['familia', 'pareja', 'eventos', 'mascota'],
 
-  GALLERY_CATEGORIES: ['cabanas', 'pileta', 'quincho', 'invierno', 'entorno'],
+  GALLERY_CATEGORIES: ['cabanas', 'habitaciones', 'pileta', 'quincho', 'sala_estar', 'estacionamiento', 'entorno'],
 
   SETTINGS_IMAGE_GROUPS: ['heroVerano', 'heroInvierno', 'about', 'events', 'og'],
 

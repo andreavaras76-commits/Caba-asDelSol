@@ -1,7 +1,7 @@
 const { Schema, model } = require('mongoose');
 const Image = require('./schemas/Image');
 
-const statSchema = new Schema({ value: Number, suffix: String, label: String }, { _id: false });
+const statSchema = new Schema({ value: Number, suffix: String, label: String }, { _id: false }); // value admite decimales (1,5 km)
 
 /** Documento único con toda la configuración editable del sitio */
 const settingsSchema = new Schema(
@@ -50,7 +50,16 @@ const settingsSchema = new Schema(
       title: { type: String, trim: true, default: '' },
       text: { type: String, trim: true, default: '' },
       capacity: { type: Number, default: 30 },
-      includes: [{ type: String, trim: true }],
+      includes: [
+        {
+          _id: false,
+          label: { type: String, trim: true, required: true },
+          icon: { type: String, trim: true, default: 'Sparkles' }, // nombre de ícono de Lucide
+          badge: { type: String, trim: true, default: '' }, // ej: "Solo verano"
+        },
+      ],
+      minHours: { type: Number, default: 3 },
+      schedule: { type: String, trim: true, default: 'A consultar' },
       lodgingOptional: { type: Boolean, default: true },
       images: [Image],
     },

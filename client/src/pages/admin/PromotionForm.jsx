@@ -152,6 +152,7 @@ export default function PromotionForm() {
       const res = await adminApi.promotions.deleteImage(id);
       setPromo(res.data);
       invalidate();
+      notifySuccess('Imagen eliminada');
     } catch (err) {
       notifyError(err);
     }

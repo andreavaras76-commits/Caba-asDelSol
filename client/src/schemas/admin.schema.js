@@ -1,5 +1,19 @@
 import { z } from 'zod';
-import { LIMITS, AMENITIES, BED_TYPES, PROMO_TYPES, SEASONS, CLIENT_TAGS, GALLERY_CATEGORIES, INQUIRY_STATUS } from '@/utils/constants';
+import {
+  LIMITS,
+  AMENITIES,
+  BED_TYPES,
+  BED_LOCATIONS,
+  CABIN_TYPES,
+  SLEEPING_OPTIONS,
+  NEARBY_CATEGORIES,
+  SERVICE_GROUPS,
+  PROMO_TYPES,
+  SEASONS,
+  CLIENT_TAGS,
+  GALLERY_CATEGORIES,
+  INQUIRY_STATUS,
+} from '@/utils/constants';
 
 /*
  * Esquemas del panel. Cada uno espeja el validator homónimo de server/src/validators.
@@ -73,9 +87,19 @@ export const cabinSchema = z.object({
   capacity: int('La capacidad', 1, LIMITS.GUESTS_MAX),
   rooms: int('Los ambientes', 1, 20),
   bathrooms: int('Los baños', 0, 10),
+  type: z.enum(keys(CABIN_TYPES), { errorMap: () => ({ message: 'El tipo de cabaña no es válido' }) }),
   beds: z
-    .array(z.object({ type: z.enum(keys(BED_TYPES), { errorMap: () => ({ message: 'Tipo de cama no válido' }) }), quantity: int('La cantidad de camas', 1, 10) }))
+    .array(
+      z.object({
+        type: z.enum(keys(BED_TYPES), { errorMap: () => ({ message: 'Tipo de cama no válido' }) }),
+        quantity: int('La cantidad de camas', 1, 10),
+        location: z.enum(keys(BED_LOCATIONS), { errorMap: () => ({ message: 'El ambiente de la cama no es válido' }) }),
+      })
+    )
     .max(10, 'Hasta 10 tipos de cama'),
+  privateBathroom: z.boolean(),
+  electricWaterHeater: z.boolean(),
+  sleepingOptions: z.array(z.enum(keys(SLEEPING_OPTIONS))),
   amenities: z.array(z.enum(keys(AMENITIES))),
   price: z.object({ amount: optionalNumber('El precio', 0, 100000000), show: z.boolean() }),
   featured: z.boolean(),
@@ -136,6 +160,7 @@ export const serviceSchema = z.object({
   name: text('El nombre', { required: true, min: 2, max: 60 }),
   icon: z.string().regex(/^[A-Za-z0-9]{2,40}$/, 'Elegí un ícono'),
   description: text('La descripción', { max: LIMITS.SHORT_TEXT_MAX }),
+  group: z.enum(keys(SERVICE_GROUPS)),
   ...common,
 });
 
@@ -153,6 +178,30 @@ export const faqSchema = z.object({
   ...common,
 });
 
+const optionalPhone = (label) => z.string().trim().regex(/^[\d\s()+-]{6,25}$/, `${label} no es válido`).optional().or(z.literal(''));
+
+export const nearbyPlaceSchema = z.object({
+  name: text('El nombre', { required: true, min: 2, max: LIMITS.NAME_MAX }),
+  category: z.enum(keys(NEARBY_CATEGORIES), { errorMap: () => ({ message: 'Elegí la categoría' }) }),
+  description: text('La descripción', { max: LIMITS.SHORT_TEXT_MAX }),
+  phone: optionalPhone('El teléfono'),
+  whatsapp: z
+    .string()
+    .trim()
+    .transform((v) => v.replace(/\D/g, ''))
+    .refine((v) => !v || /^\d{10,15}$/.test(v), 'El WhatsApp debe tener entre 10 y 15 dígitos, con código de país (ej: 5493815027738)'),
+  address: text('La dirección', { max: 160 }),
+  mapsUrl: url('El link de Maps'),
+  ...common,
+});
+
+export const specialEventSchema = z.object({
+  title: text('El título', { required: true, min: 3, max: LIMITS.TITLE_MAX }),
+  description: text('La descripción', { max: 1000 }),
+  date: z.string().optional().or(z.literal('')),
+  ...common,
+});
+
 export const reviewSchema = z.object({
   author: text('El autor', { required: true, min: 2, max: LIMITS.NAME_MAX }),
   origin: text('La procedencia', { max: 80 }),
@@ -166,6 +215,7 @@ export const reviewSchema = z.object({
 export const galleryUpdateSchema = z.object({
   alt: text('El texto alternativo', { max: 160 }),
   category: z.enum(keys(GALLERY_CATEGORIES)),
+  cabin: z.string().optional().or(z.literal('')),
   active: z.boolean(),
 });
 
@@ -219,7 +269,17 @@ export const settingsSchema = z.object({
     title: text('El título de Eventos', { max: LIMITS.TITLE_MAX }),
     text: text('El texto de Eventos', { max: LIMITS.LONG_TEXT_MAX }),
     capacity: int('La capacidad de eventos', 1, 500),
-    includes: z.array(z.object({ value: z.string().trim().min(2, 'Cada ítem incluido entre 2 y 60 caracteres').max(60, 'Cada ítem incluido entre 2 y 60 caracteres') })).max(20, 'Hasta 20 ítems'),
+    includes: z
+      .array(
+        z.object({
+          label: z.string().trim().min(2, 'Cada ítem incluido entre 2 y 60 caracteres').max(60, 'Cada ítem incluido entre 2 y 60 caracteres'),
+          icon: z.string().regex(/^[A-Za-z0-9]{2,40}$/, 'Ícono inválido'),
+          badge: z.string().trim().max(20, 'La etiqueta del ítem admite hasta 20 caracteres').optional().or(z.literal('')),
+        })
+      )
+      .max(24, 'Hasta 24 ítems'),
+    minHours: int('El mínimo de horas', 1, 24),
+    schedule: text('Los horarios', { max: 60 }),
     lodgingOptional: z.boolean(),
   }),
   showPrices: z.boolean(),

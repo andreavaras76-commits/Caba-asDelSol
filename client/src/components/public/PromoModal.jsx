@@ -3,7 +3,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2, MessageCircle } from 'lucide-react';
 import Modal from '@/components/ui/Modal';
-import { Field, Toggle } from '@/components/ui/FormField';
+import { Field, YesNoSelect } from '@/components/ui/FormField';
 import { makePromoSchema } from '@/schemas/inquiry.schema';
 import useWhatsAppInquiry from '@/hooks/useWhatsAppInquiry';
 import useFetch from '@/hooks/useFetch';
@@ -79,7 +79,7 @@ export default function PromoModal({ promo, onClose }) {
           <Field label="Huéspedes (opcional)" error={errors.guests?.message}>
             {(a) => <input type="number" inputMode="numeric" min={1} className="input" {...a} {...register('guests')} />}
           </Field>
-          <Controller name="pets" control={control} render={({ field }) => <Toggle checked={field.value} onChange={field.onChange} label="Viajo con mascota 🐾" />} />
+          <Controller name="pets" control={control} render={({ field }) => <YesNoSelect value={field.value} onChange={field.onChange} label="¿Viajás con mascota? 🐾" />} />
           <button type="submit" disabled={sending} className="btn-sol mt-2 w-full">
             {sending ? <Loader2 className="h-5 w-5 animate-spin" /> : <MessageCircle className="h-5 w-5" />}
             Consultar por WhatsApp
