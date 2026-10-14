@@ -23,6 +23,30 @@ export function Field({ label, error, hint, children, className = '', light = fa
   );
 }
 
+/**
+ * Pregunta de sí/no como select (más claro que un switch).
+ * Uso con RHF Controller: <YesNoSelect value={field.value} onChange={field.onChange} label="¿Viajás con mascota?" />
+ */
+export function YesNoSelect({ value, onChange, label, light = false, yes = 'Sí', no = 'No', className = '' }) {
+  const id = useId();
+  return (
+    <div className={`flex flex-wrap items-center gap-x-3 gap-y-1.5 ${className}`}>
+      <label htmlFor={id} className={`text-sm font-semibold ${light ? 'text-white' : 'text-carbon'}`}>
+        {label}
+      </label>
+      <select
+        id={id}
+        value={value ? 'si' : 'no'}
+        onChange={(e) => onChange(e.target.value === 'si')}
+        className={`input !w-auto min-w-0 max-w-full !py-2 !pl-3 !pr-8 text-sm ${light ? '!border-transparent !bg-white/95' : ''}`}
+      >
+        <option value="no">{no}</option>
+        <option value="si">{yes}</option>
+      </select>
+    </div>
+  );
+}
+
 /** Switch accesible (role="switch") para usar con RHF Controller o value/onChange */
 export const Toggle = forwardRef(function Toggle({ checked, onChange, label, light = false, id }, ref) {
   return (
