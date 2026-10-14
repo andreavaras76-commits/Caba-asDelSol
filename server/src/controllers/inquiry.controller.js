@@ -9,6 +9,7 @@ const { success, created } = require('../utils/response');
 const { bodyData, paginate } = require('../utils/requestData');
 const { buildInquiryMessage, waLink } = require('../utils/whatsapp');
 const { nightsBetween, startOfDayAR, startOfWeekAR, startOfMonthAR } = require('../utils/dates');
+const { clientFromInquiry } = require('./client.controller');
 
 /**
  * POST público: valida reglas de negocio, guarda la consulta y devuelve el link de WhatsApp.
@@ -31,6 +32,10 @@ exports.create = asyncHandler(async (req, res) => {
       err.errors = [{ field: 'checkIn', message: 'Sin disponibilidad en esas fechas' }];
       throw err;
     }
+    // La preferencia de cama tiene que ser una de las que ofrece esa cabaña
+    if (data.sleepingPreference && cabin.sleepingOptions?.length && !cabin.sleepingOptions.includes(data.sleepingPreference)) {
+      throw ApiError.badRequest(`${cabin.name} no ofrece esa opción de cama`, [{ field: 'sleepingPreference', message: 'Opción de cama no disponible' }]);
+    }
     data.cabinName = cabin.name;
   }
 
@@ -41,6 +46,9 @@ exports.create = asyncHandler(async (req, res) => {
   }
 
   if (data.checkIn && data.checkOut) data.nights = nightsBetween(data.checkIn, data.checkOut);
+  if (data.type === 'evento' && data.hours && data.hours < (settings.events.minHours || 3)) {
+    throw ApiError.badRequest(`El mínimo para eventos es de ${settings.events.minHours || 3} horas`, [{ field: 'hours', message: `Mínimo ${settings.events.minHours || 3} horas` }]);
+  }
   if (data.type === 'evento' && data.people > settings.events.capacity) {
     throw ApiError.badRequest(`El predio recibe hasta ${settings.events.capacity} personas`, [
       { field: 'people', message: `Máximo ${settings.events.capacity} personas` },
@@ -74,7 +82,13 @@ exports.list = asyncHandler(async (req, res) => {
 
   const { page, limit, skip } = paginate(req);
   const [items, total] = await Promise.all([
-    Inquiry.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).populate('cabin', 'name slug').populate('promotion', 'title'),
+    Inquiry.find(filter)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate('cabin', 'name slug')
+      .populate('promotion', 'title')
+      .populate('client', 'name phone lastRating feedbackRequestedAt'),
     Inquiry.countDocuments(filter),
   ]);
   success(res, { items, total, page, pages: Math.ceil(total / limit) || 1 });
@@ -83,6 +97,14 @@ exports.list = asyncHandler(async (req, res) => {
 exports.updateStatus = asyncHandler(async (req, res) => {
   const inquiry = await Inquiry.findByIdAndUpdate(req.params.id, { $set: bodyData(req) }, { new: true, runValidators: true });
   if (!inquiry) throw ApiError.notFound('Consulta no encontrada');
+
+  // Reservó → pasa a cliente automáticamente (si tenemos su WhatsApp)
+  if (inquiry.status === 'reservo') {
+    const result = await clientFromInquiry(inquiry);
+    await inquiry.populate('client', 'name phone lastRating feedbackRequestedAt');
+    const msg = result ? (result.isNew ? 'Reservó · cliente creado' : 'Reservó · vinculado a su ficha de cliente') : 'Reservó · falta su WhatsApp para crear el cliente';
+    return success(res, { ...inquiry.toJSON(), needsPhone: !result }, msg);
+  }
   success(res, inquiry, 'Consulta actualizada');
 });
 
