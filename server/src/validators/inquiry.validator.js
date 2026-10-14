@@ -1,6 +1,6 @@
 const { body, query } = require('express-validator');
 const { text, bool, int, date, oneOf } = require('./common');
-const { INQUIRY_TYPES, INQUIRY_STATUS, LIMITS } = require('../utils/constants');
+const { INQUIRY_TYPES, INQUIRY_STATUS, SLEEPING_OPTIONS, EVENT_MIN_HOURS, LIMITS } = require('../utils/constants');
 
 const startOfToday = () => {
   const d = new Date();
@@ -49,6 +49,7 @@ const create = [
   body('guests').if(isType('cabana')).exists({ values: 'null' }).withMessage('Indicá la cantidad de huéspedes'),
   int('guests', { min: 1, max: LIMITS.GUESTS_MAX, label: 'Los huéspedes' }),
   bool('pets', 'Mascota'),
+  body('sleepingPreference').optional({ values: 'falsy' }).isIn(SLEEPING_OPTIONS).withMessage('La preferencia de cama no es válida'),
 
   // Evento / día de campo
   body('eventType').if(isType('evento')).exists({ values: 'falsy' }).withMessage('Contanos qué tipo de evento es'),
@@ -58,6 +59,8 @@ const create = [
   body('eventDate').custom(notPast('La fecha del evento')),
   body('people').if(isType('evento')).exists({ values: 'null' }).withMessage('Indicá la cantidad de personas'),
   int('people', { min: 1, max: LIMITS.GUESTS_MAX, label: 'La cantidad de personas' }),
+  body('hours').if(isType('evento')).exists({ values: 'null' }).withMessage('Indicá cuántas horas'),
+  int('hours', { min: EVENT_MIN_HOURS, max: 24, label: 'Las horas del evento' }),
   bool('withLodging', 'Con hospedaje'),
 
   text('comments', { max: 500, label: 'El comentario' }),
