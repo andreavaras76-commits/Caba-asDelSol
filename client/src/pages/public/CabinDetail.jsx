@@ -5,12 +5,12 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
-import { ChevronRight, Users, DoorOpen, Bath, BedDouble, Images, MapPin } from 'lucide-react';
+import { ChevronRight, Users, DoorOpen, Bath, Images, MapPin } from 'lucide-react';
 import Seo from '@/components/ui/Seo';
 import Reveal, { staggerContainer, fadeUp } from '@/components/ui/Reveal';
 import CldImage from '@/components/ui/CldImage';
 import Skeleton from '@/components/ui/Skeleton';
-import CabinIllustration from '@/components/illustrations/CabinIllustration';
+import { PrivateBadge, CabinPlaceholder, SleepingArrangement } from '@/components/public/CabinExtras';
 import CabinInquiryForm from '@/components/public/CabinInquiryForm';
 import CabinCard from '@/components/public/CabinCard';
 import { HowToGetThere, fullAddress } from '@/components/public/Location';
@@ -19,7 +19,7 @@ import useFetch from '@/hooks/useFetch';
 import { publicApi } from '@/api/public';
 import { useSeasonStore } from '@/store/seasonStore';
 import { useSettingsStore } from '@/store/settingsStore';
-import { AMENITIES, BED_TYPES } from '@/utils/constants';
+import { AMENITIES } from '@/utils/constants';
 import { getIcon } from '@/utils/icons';
 
 const PhotoLightbox = lazy(() => import('@/components/ui/PhotoLightbox'));
@@ -39,7 +39,6 @@ export default function CabinDetail() {
   const cover = cabin.cover;
   const ordered = cover ? [cover, ...images.filter((i) => i._id !== cover._id)] : images;
   const others = cabins.filter((c) => c.id !== cabin.id).slice(0, 3);
-  const index = Math.max(0, cabins.findIndex((c) => c.id === cabin.id));
 
   return (
     <>
@@ -63,7 +62,7 @@ export default function CabinDetail() {
             <ul className="flex flex-wrap gap-2">
               {[
                 [Users, `Hasta ${cabin.capacity} huéspedes`],
-                [DoorOpen, `${cabin.rooms} ${cabin.rooms === 1 ? 'ambiente' : 'ambientes'}`],
+                [DoorOpen, cabin.type === 'monoambiente' ? 'Monoambiente' : `${cabin.rooms} ${cabin.rooms === 1 ? 'ambiente' : 'ambientes'}`],
                 [Bath, `${cabin.bathrooms} ${cabin.bathrooms === 1 ? 'baño' : 'baños'}`],
               ].map(([Icon, label]) => (
                 <li key={label} className="inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-sm font-semibold shadow-calida">
@@ -77,7 +76,7 @@ export default function CabinDetail() {
           <Reveal delay={0.1} className="mt-8">
             {ordered.length === 0 ? (
               <div className="overflow-hidden rounded-4xl shadow-calida">
-                <CabinIllustration variant={index} winter={winter} className="aspect-[16/7] w-full" label={cabin.name} />
+                <CabinPlaceholder name={cabin.name} className="aspect-[4/3] w-full sm:aspect-[16/7]" />
               </div>
             ) : (
               <>
@@ -127,7 +126,7 @@ export default function CabinDetail() {
       </div>
 
       <section className="bg-crema py-12 sm:py-16">
-        <div className="container-sol grid gap-12 lg:grid-cols-[1fr_400px]">
+        <div className="container-sol grid gap-12 lg:grid-cols-[1fr_400px] [&>*]:min-w-0">
           <div className="space-y-12">
             {cabin.description && (
               <Reveal>
@@ -136,38 +135,26 @@ export default function CabinDetail() {
               </Reveal>
             )}
 
-            {cabin.beds?.length > 0 && (
-              <Reveal>
-                <h2 className="text-3xl font-semibold text-cerro-profundo">Dónde vas a dormir</h2>
-                <ul className="mt-5 grid gap-3 sm:grid-cols-2">
-                  {cabin.beds.map((b) => (
-                    <li key={b.type} className="flex items-center gap-4 rounded-3xl bg-white p-5 shadow-calida">
-                      <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-cielo-50 text-cielo">
-                        <BedDouble className="h-6 w-6" aria-hidden="true" />
-                      </span>
-                      <span className="font-semibold">
-                        {b.quantity} {b.quantity === 1 ? BED_TYPES[b.type]?.label : BED_TYPES[b.type]?.plural}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </Reveal>
-            )}
+            <Reveal>
+              <PrivateBadge cabin={cabin} />
+            </Reveal>
+
+            <SleepingArrangement beds={cabin.beds} />
 
             {cabin.amenities?.length > 0 && (
               <div>
                 <Reveal>
                   <h2 className="text-3xl font-semibold text-cerro-profundo">Comodidades</h2>
                 </Reveal>
-                <motion.ul className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3" variants={staggerContainer(0.04)} initial="hidden" whileInView="show" viewport={{ once: true }}>
+                <motion.ul className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 [&>*]:min-w-0" variants={staggerContainer(0.04)} initial="hidden" whileInView="show" viewport={{ once: true }}>
                   {cabin.amenities.map((key) => {
                     const a = AMENITIES[key];
                     if (!a) return null;
                     const Icon = getIcon(a.icon);
                     return (
-                      <motion.li key={key} variants={fadeUp} className="flex items-center gap-3 rounded-2xl bg-white px-4 py-3 shadow-calida">
+                      <motion.li key={key} variants={fadeUp} className="flex items-center gap-2.5 rounded-2xl bg-white px-3 py-3 shadow-calida sm:gap-3 sm:px-4">
                         <Icon className="h-5 w-5 shrink-0 text-cerro" aria-hidden="true" />
-                        <span className="text-sm font-semibold">{a.label}</span>
+                        <span className="min-w-0 break-words text-sm font-semibold">{a.label}</span>
                       </motion.li>
                     );
                   })}
@@ -179,7 +166,8 @@ export default function CabinDetail() {
               <div className="flex gap-4">
                 <MapPin className="h-8 w-8 shrink-0 text-sol" aria-hidden="true" />
                 <div>
-                  <p className="font-serif text-xl font-semibold">A 1 km de la Villa de Tafí</p>
+                  <p className="font-serif text-xl font-semibold">A 1,5 km de la Villa de Tafí</p>
+                  <p className="text-sm font-semibold text-sol-200">A menos de 5 minutos en auto</p>
                   <p className="mt-1 text-sm text-crema/75">{fullAddress(address)}</p>
                 </div>
               </div>
@@ -208,7 +196,7 @@ export default function CabinDetail() {
 
       {open >= 0 && (
         <Suspense fallback={null}>
-          <PhotoLightbox images={ordered} index={open} onClose={() => setOpen(-1)} />
+          <PhotoLightbox images={ordered} index={open} onClose={() => setOpen(-1)} downloadPrefix={cabin.slug} />
         </Suspense>
       )}
     </>
@@ -221,7 +209,7 @@ function DetailSkeleton() {
       <Skeleton className="h-12 w-1/2" />
       <Skeleton className="mt-4 h-5 w-1/3" />
       <Skeleton className="mt-8 aspect-[16/7] w-full !rounded-4xl" />
-      <div className="mt-10 grid gap-10 lg:grid-cols-[1fr_400px]">
+      <div className="mt-10 grid gap-10 lg:grid-cols-[1fr_400px] [&>*]:min-w-0">
         <div className="space-y-4">
           <Skeleton className="h-8 w-1/3" />
           <Skeleton className="h-4 w-full" />

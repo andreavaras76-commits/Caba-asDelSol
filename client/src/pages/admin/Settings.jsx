@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Save, Loader2, Plus, Trash2, ExternalLink } from 'lucide-react';
+import { Save, Loader2, Plus, Trash2, ExternalLink, Pencil } from 'lucide-react';
 import { PageHeader, Card, LoadingBlock, Tabs, IconButton } from '@/components/admin/ui';
 import SettingsImages from '@/components/admin/SettingsImages';
 import { Field, Toggle } from '@/components/ui/FormField';
@@ -9,7 +9,35 @@ import { settingsSchema } from '@/schemas/admin.schema';
 import { adminApi } from '@/api/admin';
 import { useSettingsStore } from '@/store/settingsStore';
 import { clearFetchCache } from '@/hooks/useFetch';
-import { notifySuccess, handleFormError } from '@/utils/notify';
+import Swal from '@/utils/swal';
+import { notifySuccess, confirmDelete, handleFormError } from '@/utils/notify';
+import { getIcon } from '@/utils/icons';
+
+// Ícono automático según el texto del ítem (si no coincide, queda el que tenía)
+const ICON_HINTS = [
+  [/sala|sill[oó]n|sof/i, 'Sofa'], [/silla/i, 'Armchair'], [/mesa|cubierto/i, 'Utensils'], [/vajilla|plato/i, 'UtensilsCrossed'],
+  [/manteler/i, 'Layers'], [/quincho/i, 'Tent'], [/asad|parrill|fuego|le[nñ]a/i, 'Flame'], [/horno|cocina/i, 'CookingPot'],
+  [/helader|freezer/i, 'Refrigerator'], [/ba[nñ]o/i, 'Bath'], [/pileta|piscina/i, 'Waves'], [/wifi|internet/i, 'Wifi'],
+  [/estacion|auto/i, 'Car'], [/m[uú]sica|sonido|juego/i, 'Gamepad2'], [/caf[eé]|desayuno/i, 'Coffee'], [/bebida|vino|brindis/i, 'Wine'],
+  [/ni[nñ]o|chic/i, 'Baby'], [/parque|jard[ií]n|verde/i, 'Trees'], [/aire|clima/i, 'AirVent'], [/ducha/i, 'ShowerHead'],
+];
+const guessIcon = (label, fallback = 'Sparkles') => ICON_HINTS.find(([re]) => re.test(label))?.[1] || fallback;
+
+/** Pide el texto de un ítem de "Qué incluye" en un SweetAlert */
+const askItem = async (title, value = '') => {
+  const { value: text, isConfirmed } = await Swal.fire({
+    titleText: title,
+    input: 'text',
+    inputValue: value,
+    inputPlaceholder: 'Ej: Vajilla',
+    inputAttributes: { maxlength: '60', autocapitalize: 'sentences' },
+    showCancelButton: true,
+    confirmButtonText: 'Guardar',
+    cancelButtonText: 'Cancelar',
+    inputValidator: (v) => (!v.trim() ? 'Escribí el ítem' : undefined),
+  });
+  return isConfirmed ? text.trim() : null;
+};
 
 const TABS = [
   ['contacto', 'Contacto y redes'],
@@ -17,7 +45,6 @@ const TABS = [
   ['portada', 'Portada'],
   ['nosotros', 'Nosotros'],
   ['eventos', 'Eventos'],
-  ['seo', 'SEO y precios'],
 ];
 
 /** Settings del backend → valores del formulario */
@@ -43,7 +70,10 @@ const toForm = (s) => ({
     title: s.events?.title || '',
     text: s.events?.text || '',
     capacity: s.events?.capacity || 30,
-    includes: (s.events?.includes || []).map((value) => ({ value })),
+    // Soporta el formato viejo (sólo texto) y el nuevo ({ label, icon, badge })
+    includes: (s.events?.includes || []).map((i) => (typeof i === 'string' ? { label: i, icon: 'Sparkles', badge: '' } : { label: i.label, icon: i.icon || 'Sparkles', badge: i.badge || '' })),
+    minHours: s.events?.minHours || 3,
+    schedule: s.events?.schedule || 'A consultar',
     lodgingOptional: s.events?.lodgingOptional ?? true,
   },
   showPrices: Boolean(s.showPrices),
@@ -72,14 +102,14 @@ export default function Settings() {
     if (loaded) reset(toForm(settings));
   }, [loaded]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const onSubmit = async (v) => {
-    const payload = { ...v, events: { ...v.events, includes: v.events.includes.map((i) => i.value) } };
+  const onSubmit = async (v, msg) => {
+    const payload = v;
     try {
       const res = await adminApi.settings.update(payload);
       setSettings(res.data);
       reset(toForm(res.data));
       clearFetchCache();
-      notifySuccess('Configuración guardada');
+      notifySuccess(typeof msg === 'string' ? msg : 'Configuración guardada');
     } catch (err) {
       handleFormError(err, setError);
     }
@@ -88,8 +118,35 @@ export default function Settings() {
   // Ubica la pestaña del primer error para que no quede escondido
   const onInvalid = (errs) => {
     const first = Object.keys(errs)[0];
-    const map = { contact: 'contacto', social: 'contacto', businessName: 'contacto', location: 'contacto', slogan: 'contacto', address: 'ubicacion', hero: 'portada', about: 'nosotros', events: 'eventos', seo: 'seo' };
+    const map = { contact: 'contacto', social: 'contacto', businessName: 'contacto', location: 'contacto', slogan: 'contacto', showPrices: 'contacto', seo: 'contacto', address: 'ubicacion', hero: 'portada', about: 'nosotros', events: 'eventos' };
     if (map[first]) setTab(map[first]);
+  };
+
+  /** Guarda en el momento (ítems de "Qué incluye" y contadores) */
+  const persist = (msg) => handleSubmit((v) => onSubmit(v, msg), onInvalid)();
+
+  const addInclude = async () => {
+    const label = await askItem('Nuevo ítem');
+    if (!label) return;
+    includes.append({ label, icon: guessIcon(label), badge: '' });
+    persist('Ítem agregado');
+  };
+  const editInclude = async (i) => {
+    const current = watch(`events.includes.${i}`);
+    const label = await askItem('Editar ítem', current.label);
+    if (!label || label === current.label) return;
+    includes.update(i, { ...current, label, icon: guessIcon(label, current.icon) });
+    persist('Ítem actualizado');
+  };
+  const removeInclude = async (i) => {
+    if (!(await confirmDelete(`“${watch(`events.includes.${i}.label`)}”`, 'Deja de mostrarse en la sección de eventos.'))) return;
+    includes.remove(i);
+    persist('Ítem eliminado');
+  };
+  const removeStat = async (i) => {
+    if (!(await confirmDelete('este contador', 'Deja de mostrarse en la sección Nosotros.'))) return;
+    stats.remove(i);
+    persist('Contador eliminado');
   };
 
   if (!loaded) return <LoadingBlock />;
@@ -114,8 +171,14 @@ export default function Settings() {
             <Field label="Email (opcional)" error={err('contact.email')}>{(a) => <input type="email" className="input" {...a} {...register('contact.email')} />}</Field>
             <Field label="Web" error={err('contact.website')}>{(a) => <input type="url" className="input" {...a} {...register('contact.website')} />}</Field>
             <Field label="Instagram" error={err('social.instagram')}>{(a) => <input type="url" className="input" placeholder="https://www.instagram.com/…" {...a} {...register('social.instagram')} />}</Field>
-            <Field label="Threads" error={err('social.threads')}>{(a) => <input type="url" className="input" {...a} {...register('social.threads')} />}</Field>
-            <Field label="Facebook (opcional)" error={err('social.facebook')}>{(a) => <input type="url" className="input" {...a} {...register('social.facebook')} />}</Field>
+            <Field label="Facebook" error={err('social.facebook')}>{(a) => <input type="url" className="input" placeholder="https://www.facebook.com/…" {...a} {...register('social.facebook')} />}</Field>
+            <div className="sm:col-span-2">
+              <Controller
+                name="showPrices"
+                control={control}
+                render={({ field }) => <Toggle checked={field.value} onChange={field.onChange} label="Mostrar precios de referencia en el sitio" />}
+              />
+            </div>
           </Card>
         )}
 
@@ -147,8 +210,7 @@ export default function Settings() {
           <Card className="space-y-5">
             <Field label="Título del hero" error={err('hero.title')}>{(a) => <input className="input" {...a} {...register('hero.title')} />}</Field>
             <Field label="Subtítulo" error={err('hero.subtitle')}>{(a) => <textarea rows={2} className="input" {...a} {...register('hero.subtitle')} />}</Field>
-            <SettingsImages group="heroVerano" title="Fotos del hero — Verano" hint="Pileta, sol, cerros verdes. Horizontales y en alta calidad. Si no hay fotos se muestra la ilustración animada." />
-            <SettingsImages group="heroInvierno" title="Fotos del hero — Invierno" hint="Nieve, chimenea, quincho calentito." />
+            <SettingsImages group="heroVerano" title="Fotos de fondo de la portada" hint="Subí fotos de las cabañas, la pileta o el entorno (horizontales y en buena calidad): se muestran en carrusel. Si no hay ninguna, se usan las portadas de las cabañas, y si tampoco hay, la ilustración animada." />
           </Card>
         )}
 
@@ -162,13 +224,13 @@ export default function Settings() {
               <ul className="space-y-2">
                 {stats.fields.map((f, i) => (
                   <li key={f.id} className="grid grid-cols-[90px_80px_1fr_auto] items-start gap-2">
-                    <input type="number" className="input" aria-label="Valor" {...register(`about.stats.${i}.value`)} />
+                    <input type="number" step="any" className="input" aria-label="Valor" {...register(`about.stats.${i}.value`)} />
                     <input className="input" placeholder="km" aria-label="Sufijo" {...register(`about.stats.${i}.suffix`)} />
                     <div>
                       <input className="input" placeholder="de la Villa" aria-label="Etiqueta" {...register(`about.stats.${i}.label`)} />
                       {err(`about.stats.${i}.label`) && <p className="error-text">{err(`about.stats.${i}.label`)}</p>}
                     </div>
-                    <IconButton label="Quitar contador" tone="danger" className="mt-1.5" onClick={() => stats.remove(i)}>
+                    <IconButton label="Quitar contador" tone="danger" className="mt-1.5" onClick={() => removeStat(i)}>
                       <Trash2 className="h-4 w-4" />
                     </IconButton>
                   </li>
@@ -191,40 +253,39 @@ export default function Settings() {
               <Field label="Capacidad (personas)" error={err('events.capacity')}>{(a) => <input type="number" className="input" {...a} {...register('events.capacity')} />}</Field>
             </div>
             <Field label="Texto" error={err('events.text')}>{(a) => <textarea rows={4} className="input" {...a} {...register('events.text')} />}</Field>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Mínimo de horas" hint="Se valida en el formulario de eventos." error={err('events.minHours')}>{(a) => <input type="number" min={1} max={24} className="input" {...a} {...register('events.minHours')} />}</Field>
+              <Field label="Horarios" hint="Ej: A consultar · De 12 a 20 hs" error={err('events.schedule')}>{(a) => <input className="input" maxLength={60} {...a} {...register('events.schedule')} />}</Field>
+            </div>
             <div>
               <p className="label">Qué incluye</p>
-              <ul className="grid gap-2 sm:grid-cols-2">
-                {includes.fields.map((f, i) => (
-                  <li key={f.id} className="flex items-start gap-2">
-                    <div className="flex-1">
-                      <input className="input" aria-label={`Ítem ${i + 1}`} {...register(`events.includes.${i}.value`)} />
-                      {err(`events.includes.${i}.value`) && <p className="error-text">{err(`events.includes.${i}.value`)}</p>}
-                    </div>
-                    <IconButton label="Quitar" tone="danger" className="mt-1.5" onClick={() => includes.remove(i)}>
-                      <Trash2 className="h-4 w-4" />
-                    </IconButton>
-                  </li>
-                ))}
+              <p className="-mt-1 mb-2 text-xs text-carbon-light">El ícono se elige solo según el texto. Los cambios se guardan al instante.</p>
+              <ul className="divide-y divide-madera/10 rounded-2xl ring-1 ring-madera/10">
+                {includes.fields.map((f, i) => {
+                  const item = watch(`events.includes.${i}`) || f;
+                  const Icon = getIcon(item.icon);
+                  return (
+                    <li key={f.id} className="flex items-center gap-3 px-3 py-2.5">
+                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sol text-carbon" aria-hidden="true">
+                        <Icon className="h-5 w-5" />
+                      </span>
+                      <span className="min-w-0 flex-1 font-semibold text-carbon">{item.label}</span>
+                      <IconButton label={`Editar ${item.label}`} onClick={() => editInclude(i)}>
+                        <Pencil className="h-4 w-4" />
+                      </IconButton>
+                      <IconButton label={`Eliminar ${item.label}`} tone="danger" onClick={() => removeInclude(i)}>
+                        <Trash2 className="h-4 w-4" />
+                      </IconButton>
+                    </li>
+                  );
+                })}
               </ul>
-              <button type="button" onClick={() => includes.append({ value: '' })} className="btn-outline mt-2 !py-2 text-sm">
+              <button type="button" onClick={addInclude} className="btn-outline mt-3 !py-2 text-sm">
                 <Plus className="h-4 w-4" aria-hidden="true" /> Agregar ítem
               </button>
             </div>
             <Controller name="events.lodgingOptional" control={control} render={({ field }) => <Toggle checked={field.value} onChange={field.onChange} label="Ofrecer hospedaje opcional" />} />
             <SettingsImages group="events" title="Fotos del quincho y la pileta (se usan las 3 primeras)" />
-          </Card>
-        )}
-
-        {tab === 'seo' && (
-          <Card className="space-y-5">
-            <Controller
-              name="showPrices"
-              control={control}
-              render={({ field }) => <Toggle checked={field.value} onChange={field.onChange} label="Mostrar precios de referencia en el sitio (interruptor general)" />}
-            />
-            <Field label="Título para Google (máx. 70)" error={err('seo.title')}>{(a) => <input className="input" maxLength={70} {...a} {...register('seo.title')} />}</Field>
-            <Field label="Descripción para Google (máx. 160)" error={err('seo.description')}>{(a) => <textarea rows={3} maxLength={160} className="input" {...a} {...register('seo.description')} />}</Field>
-            <SettingsImages group="og" single title="Imagen para compartir (WhatsApp, Instagram, Facebook)" hint="Ideal 1200 × 630 px. Si no hay, se usa la primera foto del hero de verano." />
           </Card>
         )}
 
