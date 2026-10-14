@@ -2,11 +2,10 @@ import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion, useScroll } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import HeroLandscape from '@/components/illustrations/HeroLandscape';
-import Snowfall from '@/components/ui/Snowfall';
-import SeasonToggle from './SeasonToggle';
 // El buscador (React Hook Form + Zod) se carga aparte para aliviar el primer render
 const HeroSearch = lazy(() => import('./HeroSearch'));
-import { useSeasonStore } from '@/store/seasonStore';
+import useFetch from '@/hooks/useFetch';
+import { publicApi } from '@/api/public';
 import { useSettingsStore } from '@/store/settingsStore';
 import { cld } from '@/utils/cloudinary';
 import { scrollToId } from '@/utils/scroll';
@@ -17,9 +16,11 @@ const EASE = [0.22, 1, 0.36, 1];
 export default function Hero() {
   const ref = useRef(null);
   const reduce = useReducedMotion();
-  const season = useSeasonStore((s) => s.season);
+  const { data: cabins } = useFetch('cabins', publicApi.cabins);
   const settings = useSettingsStore((s) => s.settings);
-  const images = (season === 'invierno' ? settings.hero.imagesInvierno : settings.hero.imagesVerano) || [];
+  // Fondo: las fotos de portada cargadas en el panel; si no hay, las portadas de las cabañas
+  const heroPhotos = settings.hero.imagesVerano || [];
+  const images = heroPhotos.length ? heroPhotos : (cabins || []).map((c) => c.cover).filter(Boolean);
   const [index, setIndex] = useState(0);
   // useScroll en el mismo componente que el ref (evita leer el ref antes de montarse)
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'], layoutEffect: false });
@@ -30,7 +31,7 @@ export default function Hero() {
     if (images.length < 2 || reduce) return undefined;
     const t = setInterval(() => setIndex((i) => (i + 1) % images.length), 7000);
     return () => clearInterval(t);
-  }, [images.length, season, reduce]);
+  }, [images.length, reduce]);
 
   // Al cambiar de temporada el índice puede quedar fuera de rango hasta que corre el efecto
   const current = images.length ? images[index % images.length] : null;
@@ -46,11 +47,11 @@ export default function Hero() {
           <>
             <AnimatePresence mode="sync">
               <motion.img
-                key={`${season}-${current._id}`}
+                key={current._id}
                 src={cld(current.url, { width: 2200, crop: 'limit' })}
                 srcSet={[768, 1280, 1920, 2400].map((w) => `${cld(current.url, { width: w, crop: 'limit' })} ${w}w`).join(', ')}
                 sizes="100vw"
-                alt={current.alt || `${settings.businessName} en ${season}`}
+                alt={current.alt || `${settings.businessName}, ${settings.location}`}
                 fetchpriority="high"
                 className="absolute inset-0 h-full w-full object-cover animate-ken-burns"
                 initial={{ opacity: 0 }}
@@ -67,24 +68,14 @@ export default function Hero() {
           </>
         ) : (
           <>
-            <HeroLandscape season={season} scrollYProgress={scrollYProgress} />
+            <HeroLandscape season="verano" scrollYProgress={scrollYProgress} />
             {/* Velo para legibilidad del texto */}
             <div className="absolute inset-0 bg-gradient-to-b from-cielo-900/50 via-transparent to-transparent" />
           </>
         )}
-        <AnimatePresence>
-          {season === 'invierno' && (
-            <motion.div className="absolute inset-0" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 1 }}>
-              <Snowfall />
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
 
       <div className="container-sol flex flex-1 flex-col items-center justify-center pb-10 pt-28 text-center text-white sm:pt-32">
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }}>
-          <SeasonToggle className="mb-6" />
-        </motion.div>
 
         <motion.p
           className="font-script text-3xl text-sol-200 drop-shadow sm:text-4xl"
@@ -124,7 +115,7 @@ export default function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: EASE, delay: 1.35 }}
         >
-          <Suspense fallback={<div className="glass h-[400px] w-full rounded-4xl sm:h-[364px] lg:h-[188px]" aria-hidden="true" />}>
+          <Suspense fallback={<div className="glass h-[499px] w-full rounded-4xl sm:h-[452px] lg:h-[206px] xl:h-[188px]" aria-hidden="true" />}>
             <HeroSearch />
           </Suspense>
         </motion.div>

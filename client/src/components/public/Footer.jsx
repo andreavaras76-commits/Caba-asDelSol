@@ -1,6 +1,6 @@
-import { Link } from 'react-router-dom';
-import { Instagram, AtSign, MessageCircle, MapPin, Phone } from 'lucide-react';
-import SunLogo from '@/components/ui/SunLogo';
+import { Link, useLocation } from 'react-router-dom';
+import { Instagram, Facebook, MessageCircle, MapPin, Phone } from 'lucide-react';
+import BrandLogo from '@/components/ui/BrandLogo';
 import MountainDivider from '@/components/ui/MountainDivider';
 import { useSettingsStore } from '@/store/settingsStore';
 import { NAV_LINKS } from '@/utils/scroll';
@@ -9,6 +9,14 @@ import { mapEmbedUrl, fullAddress } from './Location';
 import LazyMap from '@/components/ui/LazyMap';
 
 export default function Footer() {
+  const { pathname } = useLocation();
+  /** El logo lleva al home; si ya estás ahí, sube suave hasta arriba */
+  const onLogo = (e) => {
+    if (pathname === '/') {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    }
+  };
   const { businessName, location, slogan, contact, social, address } = useSettingsStore((s) => s.settings);
   const year = new Date().getFullYear();
 
@@ -17,12 +25,16 @@ export default function Footer() {
       <MountainDivider from="#FBF6EC" to="#1C3A24" accent="#2F5D3A" />
       <div className="container-sol grid gap-10 pb-10 pt-8 text-center sm:grid-cols-2 sm:gap-12 sm:text-left lg:grid-cols-[1.3fr_0.8fr_1fr_1.2fr]">
         <div>
-          <Link to="/" className="inline-flex items-center gap-3 text-left">
-            <SunLogo className="h-14 w-14" />
-            <span>
-              <span className="block font-serif text-2xl font-semibold text-crema">{businessName}</span>
-              <span className="block font-script text-xl text-sol-200">{location}</span>
+          <Link
+            to="/"
+            onClick={onLogo}
+            className="inline-flex flex-col items-center gap-2 sm:items-start"
+            aria-label={`${businessName} — ${location}. Ir al inicio`}
+          >
+            <span className="inline-flex rounded-3xl bg-white p-2 shadow-calida ring-4 ring-white/10 transition-transform duration-500 hover:-translate-y-0.5">
+              <BrandLogo variant="full" size={132} className="h-[132px] w-[132px] rounded-2xl" />
             </span>
+            <span className="font-script text-xl text-sol-200">{location}</span>
           </Link>
           <p className="mx-auto mt-5 max-w-xs text-sm leading-relaxed sm:mx-0">{slogan}</p>
           <div className="mt-6 flex justify-center gap-2 sm:justify-start">
@@ -31,9 +43,9 @@ export default function Footer() {
                 <Instagram className="h-5 w-5" />
               </a>
             )}
-            {social.threads && (
-              <a href={social.threads} target="_blank" rel="noopener noreferrer" aria-label="Threads" className="rounded-full bg-white/10 p-2.5 transition hover:bg-sol hover:text-carbon">
-                <AtSign className="h-5 w-5" />
+            {social.facebook && (
+              <a href={social.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="rounded-full bg-white/10 p-2.5 transition hover:bg-sol hover:text-carbon">
+                <Facebook className="h-5 w-5" />
               </a>
             )}
             <a href={waLink(contact.whatsapp)} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="rounded-full bg-white/10 p-2.5 transition hover:bg-sol hover:text-carbon">
