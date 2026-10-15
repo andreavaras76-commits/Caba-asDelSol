@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
 import { Users, BedDouble, Clock, Hourglass, Sparkles, MessageCircle, CalendarDays } from 'lucide-react';
 import Reveal, { staggerContainer, fadeUp } from '@/components/ui/Reveal';
-import Counter from '@/components/ui/Counter';
 import CldImage from '@/components/ui/CldImage';
 import MountainDivider from '@/components/ui/MountainDivider';
 import EventForm from './EventForm';
@@ -13,10 +12,8 @@ import { waLink } from '@/utils/whatsapp';
 import { formatDayLong } from '@/utils/format';
 import { EVENT_MIN_HOURS } from '@/utils/constants';
 
-/** Normaliza los ítems de "Incluye" (soporta el formato viejo de sólo texto) */
 const normalizeIncludes = (list = []) => list.map((i) => (typeof i === 'string' ? { label: i, icon: 'Sparkles', badge: '' } : i));
 
-/** Eventos y días de campo: fondo madera cálido con textura tejida */
 export default function Events() {
   const { events, contact, businessName } = useSettingsStore((s) => s.settings);
   const { data: specials = [] } = useFetch('special-events', publicApi.specialEvents);
@@ -45,7 +42,6 @@ export default function Events() {
             <p className="mt-5 max-w-xl whitespace-pre-line text-lg text-crema/85">{events.text}</p>
           </Reveal>
 
-          {/* Condiciones */}
           <Reveal delay={0.1} className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {conditions.map(({ Icon, label, value }) => (
               <div key={label} className="rounded-3xl bg-crema/10 p-4 ring-1 ring-crema/15">
@@ -56,7 +52,6 @@ export default function Events() {
             ))}
           </Reveal>
 
-          {/* Qué incluye */}
           {includes.length > 0 && (
             <>
               <p className="mt-10 font-script text-2xl text-sol-200">Incluye</p>
@@ -102,7 +97,6 @@ export default function Events() {
         </Reveal>
       </div>
 
-      {/* Eventos especiales de temporada (Navidad, Año Nuevo…) */}
       {specials.length > 0 && (
         <div className="container-sol relative pb-16 sm:pb-24">
           <Reveal className="mb-6 flex items-center gap-3">
@@ -151,7 +145,6 @@ function SpecialEventCard({ ev, index, whatsapp, businessName }) {
   );
 }
 
-/** Guirnalda de luces (cuando el evento todavía no tiene foto) */
 function Garland() {
   const colors = ['#F6B23C', '#F2C230', '#E8893A', '#FBF6EC'];
   return (

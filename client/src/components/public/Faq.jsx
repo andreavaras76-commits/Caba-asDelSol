@@ -6,7 +6,6 @@ import { waLink } from '@/utils/whatsapp';
 import SectionHeading from '@/components/ui/SectionHeading';
 import Reveal from '@/components/ui/Reveal';
 
-/** Preguntas frecuentes: acordeón accesible (aria-expanded / aria-controls) */
 export default function Faq({ faqs = [] }) {
   const { contact, businessName } = useSettingsStore((s) => s.settings);
   const [open, setOpen] = useState(0);
