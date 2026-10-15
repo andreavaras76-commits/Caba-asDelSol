@@ -4,7 +4,6 @@ import BrandLogo from '@/components/ui/BrandLogo';
 import { BED_LOCATIONS, BED_TYPES } from '@/utils/constants';
 import { getIcon } from '@/utils/icons';
 
-/** "Baño privado · Termotanque eléctrico · Todo individual" (card y detalle de cabaña) */
 export function PrivateBadge({ cabin, compact = false, className = '' }) {
   if (!cabin?.privateBathroom && !cabin?.electricWaterHeater) return null;
   const items = [
@@ -43,7 +42,6 @@ export function PrivateBadge({ cabin, compact = false, className = '' }) {
   );
 }
 
-/** Imagen provisoria para cabañas sin fotos: el logo sobre un fondo de cerros */
 export function CabinPlaceholder({ name, className = '' }) {
   return (
     <div className={`relative flex items-center justify-center overflow-hidden bg-gradient-to-b from-cielo-100 via-crema to-crema-dark ${className}`} role="img" aria-label={`${name}: fotos próximamente`}>
@@ -63,7 +61,6 @@ export function CabinPlaceholder({ name, className = '' }) {
 
 const LOCATION_ORDER = ['dormitorio', 'cocina_comedor', 'monoambiente'];
 
-/** "¿Dónde vas a dormir?": una card por ambiente, tipo Airbnb */
 export function SleepingArrangement({ beds = [] }) {
   const rooms = LOCATION_ORDER.map((loc) => ({ loc, beds: beds.filter((b) => (b.location || 'dormitorio') === loc) })).filter((r) => r.beds.length);
   if (!rooms.length) return null;
@@ -71,7 +68,6 @@ export function SleepingArrangement({ beds = [] }) {
   return (
     <div>
       <h2 className="text-3xl font-semibold text-cerro-profundo">¿Dónde vas a dormir?</h2>
-      {/* Grilla en desktop; scroll horizontal con snap en mobile */}
       <ul className="-mx-4 mt-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 lg:grid-cols-3">
         {rooms.map(({ loc, beds: list }, i) => (
           <motion.li
