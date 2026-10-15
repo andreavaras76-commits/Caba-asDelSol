@@ -7,7 +7,6 @@ import SectionHeading from '@/components/ui/SectionHeading';
 import Reveal from '@/components/ui/Reveal';
 import { formatDay } from '@/utils/format';
 
-/** Sólo reseñas reales cargadas desde el panel. Sin reseñas, la sección no existe. */
 export default function Reviews({ reviews = [] }) {
   if (!reviews.length) return null;
   return (

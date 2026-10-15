@@ -10,7 +10,6 @@ import useFetch from '@/hooks/useFetch';
 import { publicApi } from '@/api/public';
 import { promoBadge, todayISO, addDaysISO } from '@/utils/format';
 
-/** "Quiero esta promo": pide lo mínimo y abre WhatsApp con el nombre de la promo */
 export default function PromoModal({ promo, onClose }) {
   const { data: allCabins = [] } = useFetch('cabins', publicApi.cabins);
   const cabins = promo?.appliesToAll ? allCabins : allCabins.filter((c) => promo?.cabins?.some((pc) => (pc._id || pc) === c.id));
@@ -31,7 +30,7 @@ export default function PromoModal({ promo, onClose }) {
 
   useEffect(() => {
     if (promo) reset({ name: '', cabin: cabins.length === 1 ? cabins[0].id : '', checkIn: '', checkOut: '', guests: '', pets: false });
-  }, [promo?._id]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [promo?._id]);
 
   const checkIn = watch('checkIn');
 
