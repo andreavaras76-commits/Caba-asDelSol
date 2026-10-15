@@ -1,6 +1,5 @@
 require('dotenv').config();
 
-// Al pegar valores en el panel de Vercel suelen colarse espacios o tabs: se limpian todos
 for (const k of Object.keys(process.env)) if (typeof process.env[k] === 'string') process.env[k] = process.env[k].trim();
 
 const required = ['MONGODB_URI', 'JWT_SECRET'];
@@ -11,7 +10,6 @@ if (missing.length) {
 
 const SITE_URL = (process.env.SITE_URL || 'https://www.delsoltafidelvalle.com.ar').replace(/\/$/, '');
 
-// El sitio propio (con y sin www) siempre está permitido, además de lo que diga CORS_ORIGINS
 const withAndWithoutWww = (url) => {
   try {
     const u = new URL(url);

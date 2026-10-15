@@ -1,10 +1,6 @@
 const mongoose = require('mongoose');
 const env = require('./env');
 
-/**
- * Conexión cacheada en el scope global: en serverless cada invocación "en caliente"
- * reutiliza la conexión existente en lugar de abrir una nueva.
- */
 let cached = global._mongoose;
 if (!cached) cached = global._mongoose = { conn: null, promise: null };
 
@@ -21,7 +17,7 @@ async function connectDB() {
   try {
     cached.conn = await cached.promise;
   } catch (err) {
-    cached.promise = null; // permite reintentar en la próxima invocación
+    cached.promise = null;
     throw err;
   }
   return cached.conn;
