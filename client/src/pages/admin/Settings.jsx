@@ -13,7 +13,6 @@ import Swal from '@/utils/swal';
 import { notifySuccess, confirmDelete, handleFormError } from '@/utils/notify';
 import { getIcon } from '@/utils/icons';
 
-// Ícono automático según el texto del ítem (si no coincide, queda el que tenía)
 const ICON_HINTS = [
   [/sala|sill[oó]n|sof/i, 'Sofa'], [/silla/i, 'Armchair'], [/mesa|cubierto/i, 'Utensils'], [/vajilla|plato/i, 'UtensilsCrossed'],
   [/manteler/i, 'Layers'], [/quincho/i, 'Tent'], [/asad|parrill|fuego|le[nñ]a/i, 'Flame'], [/horno|cocina/i, 'CookingPot'],
@@ -23,7 +22,6 @@ const ICON_HINTS = [
 ];
 const guessIcon = (label, fallback = 'Sparkles') => ICON_HINTS.find(([re]) => re.test(label))?.[1] || fallback;
 
-/** Pide el texto de un ítem de "Qué incluye" en un SweetAlert */
 const askItem = async (title, value = '') => {
   const { value: text, isConfirmed } = await Swal.fire({
     titleText: title,
@@ -47,7 +45,6 @@ const TABS = [
   ['eventos', 'Eventos'],
 ];
 
-/** Settings del backend → valores del formulario */
 const toForm = (s) => ({
   businessName: s.businessName || '',
   location: s.location || '',
@@ -70,7 +67,6 @@ const toForm = (s) => ({
     title: s.events?.title || '',
     text: s.events?.text || '',
     capacity: s.events?.capacity || 30,
-    // Soporta el formato viejo (sólo texto) y el nuevo ({ label, icon, badge })
     includes: (s.events?.includes || []).map((i) => (typeof i === 'string' ? { label: i, icon: 'Sparkles', badge: '' } : { label: i.label, icon: i.icon || 'Sparkles', badge: i.badge || '' })),
     minHours: s.events?.minHours || 3,
     schedule: s.events?.schedule || 'A consultar',
@@ -100,7 +96,7 @@ export default function Settings() {
   }, [fetchSettings]);
   useEffect(() => {
     if (loaded) reset(toForm(settings));
-  }, [loaded]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [loaded]);
 
   const onSubmit = async (v, msg) => {
     const payload = v;
@@ -115,14 +111,12 @@ export default function Settings() {
     }
   };
 
-  // Ubica la pestaña del primer error para que no quede escondido
   const onInvalid = (errs) => {
     const first = Object.keys(errs)[0];
     const map = { contact: 'contacto', social: 'contacto', businessName: 'contacto', location: 'contacto', slogan: 'contacto', showPrices: 'contacto', seo: 'contacto', address: 'ubicacion', hero: 'portada', about: 'nosotros', events: 'eventos' };
     if (map[first]) setTab(map[first]);
   };
 
-  /** Guarda en el momento (ítems de "Qué incluye" y contadores) */
   const persist = (msg) => handleSubmit((v) => onSubmit(v, msg), onInvalid)();
 
   const addInclude = async () => {

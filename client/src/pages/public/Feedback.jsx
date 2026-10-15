@@ -12,7 +12,6 @@ import { LoadingBlock } from '@/components/admin/ui';
 import useFetch from '@/hooks/useFetch';
 import { publicApi } from '@/api/public';
 
-// Espejo de feedbackSubmit en server/src/validators/content.validator.js
 const schema = z.object({
   rating: z.number({ invalid_type_error: 'Elegí una puntuación' }).int().min(1, 'Elegí una puntuación').max(5),
   text: z.string().trim().max(1500, 'El comentario admite hasta 1500 caracteres').optional().or(z.literal('')),
@@ -21,7 +20,6 @@ const schema = z.object({
 
 const LABELS = ['', 'Mala', 'Regular', 'Buena', 'Muy buena', '¡Excelente!'];
 
-/** Página que recibe el huésped por WhatsApp para puntuar su estadía */
 export default function Feedback() {
   const { token } = useParams();
   const { data, loading, error } = useFetch(`feedback-${token}`, () => publicApi.feedback(token));
