@@ -98,7 +98,6 @@ export default function CabinForm() {
       .finally(() => setLoading(false));
   }, [id, isNew, reset, navigate]);
 
-  // Slug automático a partir del nombre (sólo al crear y si no lo tocaron)
   const name = watch('name');
   useEffect(() => {
     if (isNew && !dirtyFields.slug) setValue('slug', slugify(name || ''));

@@ -19,7 +19,6 @@ import { confirmDelete, notifySuccess, toastSuccess, notifyError, handleFormErro
 const tagOptions = Object.entries(CLIENT_TAGS).map(([value, label]) => ({ value, label }));
 const TAG_TONES = { familia: 'blue', pareja: 'orange', eventos: 'yellow', mascota: 'green' };
 
-/** Formatea 5493815027738 → +54 9 381 502-7738 (aprox.) para que sea legible */
 export const prettyPhone = (p = '') => (p.startsWith('549') ? `+54 9 ${p.slice(3, 6)} ${p.slice(6, 9)}-${p.slice(9)}` : `+${p}`);
 
 export default function Clients() {
