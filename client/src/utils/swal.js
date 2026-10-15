@@ -1,6 +1,5 @@
 import Swal from 'sweetalert2';
 
-/** SweetAlert2 con la estética del sitio (las clases están en index.css) */
 const themed = Swal.mixin({
   buttonsStyling: false,
   customClass: {

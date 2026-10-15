@@ -2,11 +2,6 @@ import { formatDay, nightsBetween } from './format';
 
 const SLEEPING_LABELS = { matrimonial: 'Matrimonial', individuales: 'Individuales' };
 
-/**
- * Misma plantilla que server/src/utils/whatsapp.js.
- * El mensaje "oficial" lo arma el backend; esta copia se usa sólo si la API no responde,
- * para que el visitante igual pueda escribirnos.
- */
 export function buildInquiryMessage(inq, businessName = 'Cabañas del Sol') {
   const lines = [];
 
@@ -35,14 +30,9 @@ export function buildInquiryMessage(inq, businessName = 'Cabañas del Sol') {
   return lines.join('\n');
 }
 
-/** api.whatsapp.com/send en vez de wa.me: el redireccionamiento de wa.me rompe los emojis en WhatsApp Web */
 export const waLink = (phone, text = '') =>
   `https://api.whatsapp.com/send?phone=${String(phone).replace(/\D/g, '')}${text ? `&text=${encodeURIComponent(text)}` : ''}`;
 
-/**
- * Normaliza un teléfono argentino a formato wa.me (549 + área + número).
- * Espejo de toWhatsapp() en server/src/controllers/client.controller.js.
- */
 export function normalizeArPhone(raw = '') {
   let digits = String(raw).replace(/\D/g, '');
   if (!digits) return '';
@@ -53,7 +43,6 @@ export function normalizeArPhone(raw = '') {
   return digits;
 }
 
-/** Link para responder una consulta desde el panel (null si no dejó teléfono) */
 export function replyLink(inquiry, businessName = 'Cabañas del Sol') {
   const phone = normalizeArPhone(inquiry.phone);
   if (!/^\d{10,15}$/.test(phone)) return null;

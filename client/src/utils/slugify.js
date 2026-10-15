@@ -1,4 +1,3 @@
-/** Espejo de server/src/utils/slugify.js: "Cabaña El Pelado" → "cabana-el-pelado" */
 export default function slugify(text = '') {
   return text
     .toString()
