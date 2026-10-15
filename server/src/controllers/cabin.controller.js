@@ -77,9 +77,10 @@ exports.remove = asyncHandler(async (req, res) => {
 exports.uploadImages = asyncHandler(async (req, res) => {
   const cabin = await findCabin(req.params.id);
   const uploaded = await uploadMany(req.files, `cabanas/${cabin.slug}`);
-  cabin.images.push(...uploaded.map((img) => ({ ...img, alt: `${cabin.name} — Cabañas del Sol, Tafí del Valle` })));
-  await cabin.save();
-  success(res, cabin, `${uploaded.length} ${uploaded.length === 1 ? 'imagen subida' : 'imágenes subidas'}`);
+  // $push atómico: la carga masiva sube varias fotos en paralelo y ninguna debe pisar a otra
+  const images = uploaded.map((img) => ({ ...img, alt: `${cabin.name} — Cabañas del Sol, Tafí del Valle` }));
+  await Cabin.updateOne({ _id: cabin._id }, { $push: { images: { $each: images } } }, { runValidators: true });
+  success(res, await findCabin(cabin._id), `${uploaded.length} ${uploaded.length === 1 ? 'imagen subida' : 'imágenes subidas'}`);
 });
 
 /** Reordena (drag & drop) y define la portada */

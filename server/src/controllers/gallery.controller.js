@@ -45,8 +45,9 @@ exports.listAll = asyncHandler(async (req, res) => {
 exports.upload = asyncHandler(async (req, res) => {
   const { category } = req.body;
   const cabin = category === 'cabanas' && req.body.cabin ? req.body.cabin : null;
-  const start = await GalleryImage.countDocuments();
   const uploaded = await uploadMany(req.files, `galeria/${category}`);
+  // El orden se calcula después de subir: en la carga masiva llegan varias en paralelo
+  const start = await GalleryImage.countDocuments();
   const docs = await GalleryImage.insertMany(
     uploaded.map((img, i) => ({ ...img, category, cabin, order: start + i, alt: `Cabañas del Sol, Tafí del Valle — ${category}` }))
   );
