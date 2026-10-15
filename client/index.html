@@ -10,10 +10,6 @@
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
-    <!--
-      Meta tags estáticos: los bots de WhatsApp, Instagram y Facebook NO ejecutan JavaScript,
-      así que la vista previa al compartir el link sale de acá. React (Helmet) los afina para Google.
-    -->
     <title>Cabañas del Sol — Tafí del Valle, Tucumán</title>
     <meta name="description" content="Cabañas con baño privado, pileta y quincho a 1,5 km de la Villa de Tafí del Valle, a menos de 5 minutos en auto. Aceptamos mascotas. Consultá por WhatsApp." />
     <meta property="og:type" content="website" />
@@ -36,11 +32,6 @@
     <noscript>
       <p style="padding:24px;font-family:system-ui;text-align:center">Para ver el sitio activá JavaScript, o escribinos por WhatsApp al (0381) 15-502-7738.</p>
     </noscript>
-    <!--
-      Shell del hero: el título se pinta apenas llega el HTML (mejor FCP/LCP en celulares).
-      Usa las mismas clases que components/public/Hero.jsx; React lo reemplaza al montar sin que se note.
-      Si cambiás el layout del hero, actualizá también este bloque.
-    -->
     <div id="root"><section id="hero-shell" class="relative isolate flex min-h-[100svh] flex-col overflow-hidden bg-cielo-800" aria-hidden="true">
       <div class="container-sol flex flex-1 flex-col items-center justify-center pb-10 pt-28 text-center text-white sm:pt-32">
         <p class="invisible whitespace-nowrap font-sans text-3xl text-sol-200 drop-shadow sm:text-4xl">Cabañas del Sol · Tafí del Valle</p>
