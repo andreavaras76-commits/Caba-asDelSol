@@ -7,12 +7,7 @@ const SKIES = [
   ['#3A78C9', '#ADCBEF', '#FDEBC8'],
 ];
 
-/**
- * Ilustración de respaldo para cabañas sin fotos todavía.
- * `variant` cambia el cielo y la posición del sol para que no se vean todas iguales.
- */
 export default function CabinIllustration({ variant: rawVariant = 0, winter = false, className = '', label }) {
-  // Índice siempre válido (llega -1 si la lista de cabañas todavía no cargó)
   const variant = Math.abs(Math.trunc(Number(rawVariant) || 0));
   const sky = winter ? ['#244D84', '#ADCBEF', '#EEF4FC'] : SKIES[variant % SKIES.length];
   const sunX = [300, 110, 250, 150][variant % 4];

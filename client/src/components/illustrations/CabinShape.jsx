@@ -1,13 +1,8 @@
 import { motion } from 'framer-motion';
 
-/**
- * Cabaña amarilla con techo de madera, ventanas con luz cálida y chimenea de piedra.
- * Coordenadas locales: base en y=0, ancho ~100. Se posiciona con `x`, `y`, `scale`.
- */
 export default function CabinShape({ x = 0, y = 0, scale = 1, winter = false, smoke = false, delay = 0 }) {
   return (
     <g transform={`translate(${x} ${y}) scale(${scale})`}>
-      {/* Humo de la chimenea (sólo en invierno) */}
       {smoke &&
         [0, 1, 2].map((i) => (
           <motion.circle
@@ -21,22 +16,17 @@ export default function CabinShape({ x = 0, y = 0, scale = 1, winter = false, sm
             transition={{ duration: 4.5, repeat: Infinity, delay: delay + i * 1.5, ease: 'easeOut' }}
           />
         ))}
-      {/* Chimenea de piedra */}
       <rect x="62" y="-74" width="16" height="40" rx="2" fill="#B9B3A8" />
       <path d="M62 -64 h16 M62 -54 h16 M62 -44 h16 M70 -74 v10 M66 -64 v10 M74 -54 v10" stroke="#8E887D" strokeWidth="1.2" />
       {winter && <rect x="60" y="-78" width="20" height="6" rx="3" fill="#fff" />}
 
-      {/* Cuerpo */}
       <rect x="4" y="-42" width="92" height="42" fill="#F2C230" />
       <rect x="4" y="-42" width="92" height="42" fill="url(#cabinShade)" />
-      {/* Techo */}
       <path d="M-8 -40 L50 -86 L108 -40 Z" fill="#7A4A2A" />
       <path d="M-8 -40 L50 -86 L108 -40" fill="none" stroke="#55331C" strokeWidth="3" strokeLinejoin="round" />
       {winter && <path d="M-6 -44 L50 -88 L106 -44 L96 -44 L50 -78 L4 -44 Z" fill="#ffffff" />}
-      {/* Ventana redonda del altillo */}
       <circle cx="50" cy="-58" r="7" fill="#FDEBC8" stroke="#7A4A2A" strokeWidth="2.5" />
 
-      {/* Ventanas con marco de madera y luz cálida */}
       {[14, 64].map((wx) => (
         <g key={wx}>
           <rect x={wx} y="-32" width="22" height="18" fill="#FDEBC8" />
@@ -44,16 +34,13 @@ export default function CabinShape({ x = 0, y = 0, scale = 1, winter = false, sm
           <path d={`M${wx + 11} -32 v18 M${wx} -23 h22`} stroke="#7A4A2A" strokeWidth="2" />
         </g>
       ))}
-      {/* Puerta */}
       <rect x="40" y="-28" width="20" height="28" rx="2" fill="#7A4A2A" />
       <circle cx="55" cy="-13" r="1.6" fill="#F6B23C" />
-      {/* Escalón de piedra */}
       <rect x="36" y="-2" width="28" height="4" rx="1" fill="#B9B3A8" />
     </g>
   );
 }
 
-/** Definiciones SVG compartidas (incluir una vez por <svg>) */
 export function CabinDefs() {
   return (
     <defs>

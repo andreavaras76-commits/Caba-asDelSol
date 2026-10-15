@@ -1,7 +1,5 @@
 import { Loader2, Inbox } from 'lucide-react';
 
-/** Piezas visuales reutilizables del panel */
-
 export function PageHeader({ title, subtitle, actions }) {
   return (
     <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -35,7 +33,7 @@ export function EmptyState({ icon: Icon = Inbox, title, text, action, inline = f
   );
 }
 
-export function Spinner({ className = 'h-6 w-6', label = 'Cargando…' }) {
+function Spinner({ className = 'h-6 w-6', label = 'Cargando…' }) {
   return (
     <span role="status" className="inline-flex items-center gap-2 text-carbon-light">
       <Loader2 className={`animate-spin ${className}`} aria-hidden="true" />
@@ -67,7 +65,6 @@ export function Badge({ tone = 'gray', children, className = '' }) {
 
 export const INQUIRY_TONES = { nueva: 'blue', respondida: 'yellow', reservo: 'green', no_concreto: 'gray' };
 
-/** Botón de ícono accesible (siempre con aria-label) */
 export function IconButton({ label, children, className = '', tone = 'default', ...rest }) {
   const tones = {
     default: 'text-carbon-light hover:bg-crema-dark hover:text-carbon',
@@ -81,7 +78,6 @@ export function IconButton({ label, children, className = '', tone = 'default', 
   );
 }
 
-/** Pestañas simples */
 export function Tabs({ tabs, value, onChange }) {
   return (
     <div role="tablist" className="mb-6 flex flex-wrap gap-1 rounded-3xl bg-white p-1.5 shadow-calida">
