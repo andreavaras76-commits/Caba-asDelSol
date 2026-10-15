@@ -10,12 +10,6 @@ import {
 import { SortableContext, arrayMove, rectSortingStrategy, verticalListSortingStrategy, sortableKeyboardCoordinates, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-/**
- * Lista/grilla reordenable con drag & drop (mouse, touch y teclado).
- * - items: [{ id, ... }]
- * - onReorder(newItems): recibe el array ya reordenado
- * - children(item, handleProps, isDragging)
- */
 export default function Sortable({ items, onReorder, children, layout = 'grid', className = '' }) {
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),

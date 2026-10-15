@@ -11,25 +11,21 @@ import useBulkUpload from '@/hooks/useBulkUpload';
 
 const PATHS = {
   heroVerano: (s) => s.hero.imagesVerano,
-  heroInvierno: (s) => s.hero.imagesInvierno,
   about: (s) => s.about.images,
   events: (s) => s.events.images,
   og: (s) => (s.seo.ogImage ? [s.seo.ogImage] : []),
 };
 
-/** Fotos de un grupo de la configuración (hero por temporada, nosotros, eventos, Open Graph) */
 export default function SettingsImages({ group, title, hint, single = false }) {
   const { settings, setSettings } = useSettingsStore();
   const [uploading, setUploading] = useState(false);
   const [items, setItems] = useState([]);
   const images = PATHS[group](settings) || [];
-  // Firma estable: el array se recrea en cada render (sobre todo el de la imagen OG)
   const signature = images.map((i) => i._id).join(",");
-  useEffect(() => setItems(images.map((i) => ({ ...i, id: i._id || i.public_id }))), [signature]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => setItems(images.map((i) => ({ ...i, id: i._id || i.public_id }))), [signature]);
 
   const apply = (res) => setSettings(res.data);
 
-  // Varias fotos (hero, nosotros, eventos): carga masiva de a una
   const bulk = useBulkUpload(
     (file) => adminApi.settings.uploadImages(group, [file]),
     (responses) => apply(responses.reduce((a, b) => ((PATHS[group](b.data) || []).length > (PATHS[group](a.data) || []).length ? b : a)))
