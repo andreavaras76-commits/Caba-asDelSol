@@ -12,15 +12,11 @@ import useFetch, { clearFetchCache } from '@/hooks/useFetch';
 import { ICONS, getIcon } from '@/utils/icons';
 import { confirmDelete, notifySuccess, notifyError, handleFormError } from '@/utils/notify';
 
-/**
- * CRUD genérico para contenidos simples con `active` + orden por drag & drop.
- * config: { key, publicKey, title, subtitle, singular, api, schema, defaults, toForm, fields, summary, withImage }
- */
 export default function ContentCrud({ config }) {
   const { key, publicKey, title, subtitle, singular, api, summary, withImage } = config;
   const { data, loading, reload } = useFetch(key, () => api.list().then((r) => r.data));
   const [items, setItems] = useState([]);
-  const [editing, setEditing] = useState(null); // null | 'new' | item
+  const [editing, setEditing] = useState(null);
   useEffect(() => setItems((data || []).map((i) => ({ ...i, id: i._id }))), [data]);
 
   const refresh = () => {
@@ -130,14 +126,13 @@ function ItemModal({ config, item, onClose, onSaved, withImage }) {
 
   useEffect(() => {
     if (item) reset(isNew ? config.defaults : config.toForm(item));
-  }, [item]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [item]);
 
   const onSubmit = async (values) => {
     try {
       const res = isNew ? await config.api.create(values) : await config.api.update(item._id, values);
       notifySuccess(res.message);
       onSaved();
-      // Con imagen: al crear seguimos en el modal para poder subirla
       if (withImage && isNew) setCurrent(res.data);
       else onClose();
     } catch (err) {

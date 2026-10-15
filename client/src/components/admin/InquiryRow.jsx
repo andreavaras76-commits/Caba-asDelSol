@@ -5,7 +5,6 @@ import { formatDay, timeAgo } from '@/utils/format';
 
 const TYPE_ICON = { cabana: Home, evento: PartyPopper, promo: Gift, general: MessageCircle };
 
-/** Resumen de una consulta (para listados y dashboard) */
 export function InquirySummary({ inquiry }) {
   const Icon = TYPE_ICON[inquiry.type] || MessageCircle;
   const stay =
