@@ -26,6 +26,7 @@ module.exports = (err, req, res, next) => {
     message = err.code === 'LIMIT_FILE_SIZE' ? 'La imagen supera el tamaño máximo permitido' : err.message;
   } else if (err.message === 'Origen no permitido por CORS') {
     status = 403;
+    message = 'No pudimos conectarnos con el sistema. Probá de nuevo en unos minutos.';
   }
 
   if (status >= 500) console.error(err);
@@ -33,7 +34,7 @@ module.exports = (err, req, res, next) => {
   res.status(status).json({
     ok: false,
     data: null,
-    message: status >= 500 && env.NODE_ENV === 'production' ? 'Error interno del servidor' : message,
+    message: status >= 500 && env.NODE_ENV === 'production' ? 'Algo salió mal de nuestro lado. Probá de nuevo en unos minutos.' : message,
     ...(errors.length && { errors }),
   });
 };
