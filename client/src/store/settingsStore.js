@@ -1,11 +1,7 @@
 import { create } from 'zustand';
 import { publicApi } from '@/api/public';
 
-/**
- * Valores de respaldo (los mismos del seed) para que el sitio funcione
- * aunque la API tarde o no responda. Los datos reales siempre vienen del panel.
- */
-export const DEFAULT_SETTINGS = {
+const DEFAULT_SETTINGS = {
   businessName: 'Cabañas del Sol',
   location: 'Tafí del Valle',
   slogan: 'En las coordenadas ideales para disfrutar de la placidez y el esparcimiento en los Valles.',
@@ -21,7 +17,7 @@ export const DEFAULT_SETTINGS = {
     lat: -26.8596544,
     lng: -65.6869324,
   },
-  hero: { title: 'Amanece en los Valles', subtitle: '', imagesVerano: [], imagesInvierno: [] },
+  hero: { title: 'Amanece en los Valles', subtitle: '', imagesVerano: [] },
   about: { title: 'El complejo', text: '', images: [], stats: [] },
   events: { title: 'Eventos y días de campo', text: '', capacity: 30, includes: [], lodgingOptional: true, images: [] },
   showPrices: false,
