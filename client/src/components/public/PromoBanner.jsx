@@ -8,7 +8,6 @@ import { scrollToId } from '@/utils/scroll';
 
 const DISMISS_KEY = 'cds_promo_dismissed';
 
-/** Tarjeta flotante con la promo destacada + cuenta regresiva si tiene fecha de fin */
 export default function PromoBanner({ onWant }) {
   const promos = usePromoStore((s) => s.promos);
   const promo = promos.find((p) => p.featured);
@@ -21,7 +20,6 @@ export default function PromoBanner({ onWant }) {
     try {
       dismissed = sessionStorage.getItem(DISMISS_KEY) === promo._id;
     } catch {
-      /* storage bloqueado: mostramos igual */
     }
     if (dismissed) return undefined;
     const t = setTimeout(() => setVisible(true), 3200);
@@ -33,7 +31,6 @@ export default function PromoBanner({ onWant }) {
     try {
       sessionStorage.setItem(DISMISS_KEY, promo._id);
     } catch {
-      /* noop */
     }
   };
 

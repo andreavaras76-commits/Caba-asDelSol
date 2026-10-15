@@ -14,10 +14,6 @@ const CATEGORY_TONES = {
   paseos: 'bg-cerro-profundo text-crema',
 };
 
-/**
- * Tarjeta de un lugar cercano ("Todo cerca tuyo"): ícono por categoría y botones Llamar / WhatsApp / Cómo llegar.
- * Si todavía no tiene datos de contacto, ofrece pedírselos al complejo por WhatsApp.
- */
 export function PlaceCard({ place: p, contactWhatsapp, businessName = 'Cabañas del Sol' }) {
   const cat = NEARBY_CATEGORIES[p.category] || { label: p.category, icon: 'MapPin' };
   const Icon = getIcon(cat.icon);

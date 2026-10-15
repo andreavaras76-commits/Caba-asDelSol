@@ -27,7 +27,6 @@ export default function Navbar() {
     return () => window.removeEventListener('keydown', onKey);
   }, [open]);
 
-  /** El logo lleva al home; si ya estás en el home, sube suave hasta arriba */
   const onLogo = (e) => {
     setOpen(false);
     if (onHome) {
@@ -100,7 +99,6 @@ export default function Navbar() {
         </nav>
       </header>
 
-      {/* Menú mobile fullscreen */}
       <AnimatePresence>
         {open && (
           <motion.div
