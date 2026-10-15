@@ -1,6 +1,4 @@
-// Primero de todo: endurecimiento en producción (antes de que cargue React)
 import './security/hardening';
-// Detecta el shell del hero antes de que React lo reemplace
 import './utils/shell';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
@@ -9,7 +7,6 @@ import { HelmetProvider } from 'react-helmet-async';
 import { MotionConfig } from 'framer-motion';
 import App from './App.jsx';
 import ErrorBoundary from './components/ui/ErrorBoundary';
-// Fuentes autoalojadas: Fraunces (con eje óptico), Manrope y Caveat
 import '@fontsource-variable/fraunces/opsz.css';
 import '@fontsource-variable/manrope/index.css';
 import '@fontsource/caveat/500.css';
@@ -20,7 +17,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <ErrorBoundary>
       <HelmetProvider>
         <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-          {/* reducedMotion="user" hace que Framer Motion respete prefers-reduced-motion */}
           <MotionConfig reducedMotion="user">
             <App />
           </MotionConfig>
