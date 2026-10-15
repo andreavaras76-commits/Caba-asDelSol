@@ -9,14 +9,12 @@ import { confirmDelete, notifySuccess, notifyError } from '@/utils/notify';
 import Swal from '@/utils/swal';
 import useBulkUpload from '@/hooks/useBulkUpload';
 
-/** Galería de una cabaña: subir varias, reordenar con drag & drop, elegir portada, alt y borrar */
 export default function CabinGallery({ cabin, onChange }) {
   const [items, setItems] = useState([]);
   useEffect(() => setItems(cabin.images.map((img) => ({ ...img, id: img._id }))), [cabin.images]);
 
   const coverId = cabin.cover?._id;
 
-  // Carga masiva: de a una foto por envío; la respuesta con más fotos es el estado final de la cabaña
   const { upload, progress, uploading } = useBulkUpload(
     (file) => adminApi.cabins.uploadImages(cabin._id, [file]),
     (responses) => onChange(responses.reduce((a, b) => (b.data.images.length > a.data.images.length ? b : a)).data)
