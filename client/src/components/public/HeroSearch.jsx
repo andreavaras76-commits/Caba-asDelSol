@@ -11,13 +11,11 @@ import { publicApi } from '@/api/public';
 import { todayISO, addDaysISO } from '@/utils/format';
 import { LIMITS, SLEEPING_OPTIONS } from '@/utils/constants';
 
-/** Buscador flotante del hero → consulta por WhatsApp */
 export default function HeroSearch() {
   const { data: cabins = [] } = useFetch('cabins', publicApi.cabins);
   const { send, sending } = useWhatsAppInquiry();
   const maxCapacity = useMemo(() => Math.max(1, ...cabins.map((c) => c.capacity)), [cabins]);
   const capacityOf = (id) => cabins.find((c) => c.id === id)?.capacity || (cabins.length ? maxCapacity : LIMITS.GUESTS_MAX);
-  // Opciones de cama: las de la cabaña elegida, o todas si todavía no eligió
   const sleepingFor = (id) => (id ? cabins.find((c) => c.id === id)?.sleepingOptions || [] : Object.keys(SLEEPING_OPTIONS));
 
   const {
@@ -28,7 +26,6 @@ export default function HeroSearch() {
     setValue,
     formState: { errors },
   } = useForm({
-    // El tope de huéspedes depende de la cabaña elegida
     resolver: (values, ctx, opts) =>
       zodResolver(makeStaySchema({ maxGuests: capacityOf(values.cabin), sleepingOptions: sleepingFor(values.cabin) }))(values, ctx, opts),
     defaultValues: { checkIn: '', checkOut: '', guests: 2, cabin: '', pets: false, name: '', sleepingPreference: '' },
@@ -37,11 +34,10 @@ export default function HeroSearch() {
   const checkIn = watch('checkIn');
   const cabinId = watch('cabin');
   const sleepingChoices = sleepingFor(cabinId);
-  // Si cambia la cabaña y la cama elegida ya no se ofrece, se limpia
   useEffect(() => {
     const pref = watch('sleepingPreference');
     if (pref && !sleepingChoices.includes(pref)) setValue('sleepingPreference', '');
-  }, [cabinId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [cabinId]);
   const guestsMax = capacityOf(cabinId);
 
   const onSubmit = async (values) => {
@@ -50,9 +46,7 @@ export default function HeroSearch() {
   };
 
   const inputCls = 'input !border-transparent !bg-white/95 !py-3 pl-10';
-  // En mobile fechas y selects van sin ícono: así el texto no se corta
   const dateCls = 'input !border-transparent !bg-white/95 !py-3 !px-3 sm:!pl-10';
-  // Selects sin ícono propio: así entra el texto completo con 6 campos en una fila
   const selCls = 'input !border-transparent !bg-white/95 !py-3 !pl-3 !pr-8';
   const dateIcon = 'pointer-events-none absolute left-3 top-1/2 hidden h-5 w-5 -translate-y-1/2 text-madera sm:block';
 

@@ -6,13 +6,11 @@ import { useSettingsStore } from '@/store/settingsStore';
 import { waLink } from '@/utils/whatsapp';
 import LazyMap from '@/components/ui/LazyMap';
 
-/** URL de embed de Google Maps (sin API key) centrada en las coordenadas del complejo */
 export const mapEmbedUrl = ({ lat, lng }, zoom = 15) =>
   `https://www.google.com/maps/embed?origin=mfe&pb=!1m3!2m1!1s${lat},${lng}!6i${zoom}!3m1!1ses!5m1!1ses`;
 
 export const fullAddress = (a) => [a.street, `${a.city} (CP ${a.postalCode})`, a.province, a.country].filter(Boolean).join(', ');
 
-/** Botón "Cómo llegar": el link sale de la configuración (en mobile abre la app de Google Maps) */
 export function HowToGetThere({ className = 'btn-sol', label = 'Cómo llegar' }) {
   const mapsUrl = useSettingsStore((s) => s.settings.address.mapsUrl);
   return (
