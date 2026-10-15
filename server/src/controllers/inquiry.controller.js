@@ -11,10 +11,6 @@ const { buildInquiryMessage, waLink } = require('../utils/whatsapp');
 const { nightsBetween, startOfDayAR, startOfWeekAR, startOfMonthAR } = require('../utils/dates');
 const { clientFromInquiry } = require('./client.controller');
 
-/**
- * POST público: valida reglas de negocio, guarda la consulta y devuelve el link de WhatsApp.
- * El front redirige a whatsappUrl apenas recibe la respuesta.
- */
 exports.create = asyncHandler(async (req, res) => {
   const data = bodyData(req);
   const settings = await Settings.getSingleton();
@@ -32,7 +28,6 @@ exports.create = asyncHandler(async (req, res) => {
       err.errors = [{ field: 'checkIn', message: 'Sin disponibilidad en esas fechas' }];
       throw err;
     }
-    // La preferencia de cama tiene que ser una de las que ofrece esa cabaña
     if (data.sleepingPreference && cabin.sleepingOptions?.length && !cabin.sleepingOptions.includes(data.sleepingPreference)) {
       throw ApiError.badRequest(`${cabin.name} no ofrece esa opción de cama`, [{ field: 'sleepingPreference', message: 'Opción de cama no disponible' }]);
     }
@@ -61,8 +56,6 @@ exports.create = asyncHandler(async (req, res) => {
   created(res, { id: inquiry._id, message: inquiry.message, whatsappUrl: waLink(settings.contact.whatsapp, inquiry.message) }, '¡Listo! Te llevamos a WhatsApp');
 });
 
-// ---------- Admin ----------
-
 exports.list = asyncHandler(async (req, res) => {
   const { status, type, cabin, promotion, from, to, q } = req.query;
   const filter = {};
@@ -73,7 +66,7 @@ exports.list = asyncHandler(async (req, res) => {
   if (from || to) {
     filter.createdAt = {};
     if (from) filter.createdAt.$gte = new Date(from);
-    if (to) filter.createdAt.$lte = new Date(new Date(to).getTime() + 24 * 3600 * 1000 - 1); // incluye el día completo
+    if (to) filter.createdAt.$lte = new Date(new Date(to).getTime() + 24 * 3600 * 1000 - 1);
   }
   if (q) {
     const rx = new RegExp(String(q).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
@@ -98,7 +91,6 @@ exports.updateStatus = asyncHandler(async (req, res) => {
   const inquiry = await Inquiry.findByIdAndUpdate(req.params.id, { $set: bodyData(req) }, { new: true, runValidators: true });
   if (!inquiry) throw ApiError.notFound('Consulta no encontrada');
 
-  // Reservó → pasa a cliente automáticamente (si tenemos su WhatsApp)
   if (inquiry.status === 'reservo') {
     const result = await clientFromInquiry(inquiry);
     await inquiry.populate('client', 'name phone lastRating feedbackRequestedAt');
@@ -114,7 +106,6 @@ exports.remove = asyncHandler(async (req, res) => {
   success(res, null, 'Consulta eliminada');
 });
 
-/** Métricas del dashboard */
 exports.stats = asyncHandler(async (req, res) => {
   const now = new Date();
   const last30 = new Date(now.getTime() - 30 * 24 * 3600 * 1000);

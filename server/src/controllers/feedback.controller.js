@@ -5,13 +5,8 @@ const ApiError = require('../utils/ApiError');
 const asyncHandler = require('../utils/asyncHandler');
 const { success, created } = require('../utils/response');
 
-// Sólo letras y números: WhatsApp toma "_" y "-" como formato y corta el link
 const newToken = () => crypto.randomBytes(16).toString('hex');
 
-/**
- * Panel: crea (o reutiliza) un pedido de opinión para un cliente y devuelve el token.
- * El front arma el link /opinar/:token y abre WhatsApp con el mensaje.
- */
 exports.request = asyncHandler(async (req, res) => {
   const client = await Client.findById(req.body.client).populate('cabin', 'name');
   if (!client) throw ApiError.notFound('Cliente no encontrado');
@@ -29,7 +24,6 @@ exports.request = asyncHandler(async (req, res) => {
       rating: null,
     });
   }
-  // Los links viejos podían terminar en "_" y WhatsApp los cortaba: se regeneran
   if (!/^[a-f0-9]+$/.test(review.token || '')) review.token = newToken();
   review.requestedAt = new Date();
   await review.save();
@@ -39,7 +33,6 @@ exports.request = asyncHandler(async (req, res) => {
   created(res, { token: review.token, reviewId: review._id, cabinName: client.cabin?.name || '' }, 'Pedido de opinión listo');
 });
 
-/** Panel: todas las opiniones (pedidas y manuales) con cliente y cabaña */
 exports.list = asyncHandler(async (req, res) => {
   const filter = {};
   if (req.query.status === 'pendiente') filter.status = 'pendiente';
@@ -51,7 +44,6 @@ exports.list = asyncHandler(async (req, res) => {
   success(res, { items, stats: { total: items.length, answered: answered.length, average: avg && Math.round(avg * 10) / 10 } });
 });
 
-/** Público: datos mínimos para mostrar la página de opinión */
 exports.show = asyncHandler(async (req, res) => {
   const review = await Review.findOne({ token: req.params.token, kind: 'feedback' }).populate('cabin', 'name');
   if (!review) throw ApiError.notFound('Este link de opinión no existe o ya no está disponible');
@@ -62,7 +54,6 @@ exports.show = asyncHandler(async (req, res) => {
   });
 });
 
-/** Público: el huésped envía su puntuación y comentario (una sola vez) */
 exports.submit = asyncHandler(async (req, res) => {
   const review = await Review.findOne({ token: req.params.token, kind: 'feedback' });
   if (!review) throw ApiError.notFound('Este link de opinión no existe o ya no está disponible');
@@ -76,7 +67,7 @@ exports.submit = asyncHandler(async (req, res) => {
     submittedAt: new Date(),
     date: new Date(),
     source: 'Huésped',
-    active: false, // la publica el dueño desde el panel
+    active: false,
   });
   await review.save();
 

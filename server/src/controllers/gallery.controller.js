@@ -8,11 +8,6 @@ const { uploadMany, destroyImage } = require('../utils/cloudinaryUpload');
 
 const SORT = { order: 1, createdAt: -1 };
 
-/**
- * Público: fotos de la galería + las fotos de cada cabaña activa.
- * Cada foto trae `cabin` ({ _id, name, slug }) si pertenece a una cabaña, así el front arma
- * los filtros "Cabaña 1", "Cabaña 2"… sólo para las cabañas que tienen fotos.
- */
 exports.listPublic = asyncHandler(async (req, res) => {
   const [gallery, cabins] = await Promise.all([
     GalleryImage.find({ active: true }).sort(SORT).populate('cabin', 'name slug active order').lean(),
@@ -41,12 +36,10 @@ exports.listAll = asyncHandler(async (req, res) => {
   success(res, await GalleryImage.find(filter).sort(SORT));
 });
 
-/** Subida múltiple: todas las fotos del lote quedan en la misma categoría */
 exports.upload = asyncHandler(async (req, res) => {
   const { category } = req.body;
   const cabin = category === 'cabanas' && req.body.cabin ? req.body.cabin : null;
   const uploaded = await uploadMany(req.files, `galeria/${category}`);
-  // El orden se calcula después de subir: en la carga masiva llegan varias en paralelo
   const start = await GalleryImage.countDocuments();
   const docs = await GalleryImage.insertMany(
     uploaded.map((img, i) => ({ ...img, category, cabin, order: start + i, alt: `Cabañas del Sol, Tafí del Valle — ${category}` }))

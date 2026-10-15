@@ -4,10 +4,6 @@ const { success, created } = require('../utils/response');
 const { bodyData, flatten } = require('../utils/requestData');
 const { uploadBuffer, destroyImage } = require('../utils/cloudinaryUpload');
 
-/**
- * Genera los controladores de un CRUD simple con `active` y `order`
- * (servicios, atractivos, FAQ, reseñas).
- */
 module.exports = function crudFactory(Model, { label = 'Elemento', sort = { order: 1, createdAt: 1 }, folder } = {}) {
   const find = async (id) => {
     const doc = await Model.findById(id);
@@ -42,14 +38,12 @@ module.exports = function crudFactory(Model, { label = 'Elemento', sort = { orde
       success(res, null, `${label} eliminado`);
     }),
 
-    /** Recibe { ids: [...] } en el orden deseado */
     reorder: asyncHandler(async (req, res) => {
       await Model.bulkWrite(req.body.ids.map((id, index) => ({ updateOne: { filter: { _id: id }, update: { $set: { order: index } } } })));
       success(res, await Model.find().sort(sort), 'Orden actualizado');
     }),
   };
 
-  // Imagen única opcional (ej: atractivos)
   if (folder) {
     controllers.uploadImage = asyncHandler(async (req, res) => {
       const doc = await find(req.params.id);
