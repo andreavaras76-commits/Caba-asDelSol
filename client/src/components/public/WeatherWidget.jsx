@@ -7,7 +7,6 @@ const WEATHER_ICONS = { Sun, Moon, CloudSun, Cloud, CloudFog, CloudDrizzle, Clou
 
 const dayName = (iso) => new Intl.DateTimeFormat('es-AR', { weekday: 'short', timeZone: 'UTC' }).format(new Date(`${iso}T12:00:00Z`));
 
-/** Widget de clima en vivo de Tafí del Valle */
 export default function WeatherWidget({ lat, lng }) {
   const { data, loading, error } = useWeather(lat, lng);
 
