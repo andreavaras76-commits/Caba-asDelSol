@@ -9,7 +9,6 @@ import { AMENITIES } from '@/utils/constants';
 import { getIcon } from '@/utils/icons';
 import { formatPrice } from '@/utils/format';
 
-/** Card de cabaña: zoom suave de la foto y aparición de amenities al hover */
 export default function CabinCard({ cabin, index = 0, winter = false }) {
   const amenities = (cabin.amenities || []).slice(0, 6);
   return (
@@ -35,7 +34,6 @@ export default function CabinCard({ cabin, index = 0, winter = false }) {
             </span>
           )}
 
-          {/* Amenities que aparecen al hover (en mobile siempre visibles) */}
           <ul className="absolute inset-x-4 bottom-4 flex flex-wrap gap-1.5 transition-all duration-500 sm:translate-y-4 sm:opacity-0 sm:group-hover:translate-y-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100">
             {amenities.map((key) => {
               const a = AMENITIES[key];

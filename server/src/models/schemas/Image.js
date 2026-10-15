@@ -1,6 +1,5 @@
 const { Schema } = require('mongoose');
 
-/** Subdocumento de imagen alojada en Cloudinary */
 module.exports = new Schema(
   {
     url: { type: String, required: true },

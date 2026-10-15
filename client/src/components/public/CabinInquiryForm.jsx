@@ -14,12 +14,10 @@ import { SLEEPING_OPTIONS } from '@/utils/constants';
 
 const NO_BLOCKS = [];
 
-/** Formulario de consulta prearmado con la cabaña (página de detalle) */
 export default function CabinInquiryForm({ cabin }) {
   const { send, sending } = useWhatsAppInquiry();
   const { data: blockedData } = useFetch(`blocked-${cabin.id}`, () => publicApi.blockedDates(cabin.id));
   const blocked = blockedData || NO_BLOCKS;
-  // Seleccionamos la lista y filtramos con useMemo (un selector que crea arrays nuevos re-renderiza en loop)
   const allPromos = usePromoStore((s) => s.promos);
   const promos = useMemo(() => allPromos.filter((p) => p.appliesToAll || p.cabins?.some((c) => (c._id || c) === cabin.id)), [allPromos, cabin.id]);
 
@@ -41,10 +39,9 @@ export default function CabinInquiryForm({ cabin }) {
   const nights = checkIn && checkOut && checkOut > checkIn ? nightsBetween(checkIn, checkOut) : 0;
   const selectedPromo = promos.find((p) => p._id === promotion);
 
-  // Revalida al llegar los bloqueos (por si el usuario ya eligió fechas)
   useEffect(() => {
     if (isSubmitted) trigger();
-  }, [blocked]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [blocked]);
 
   const onSubmit = (values) =>
     send({ ...values, type: values.promotion ? 'promo' : 'cabana' }, { cabinName: cabin.name, promotionTitle: selectedPromo?.title });

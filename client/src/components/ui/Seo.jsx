@@ -4,14 +4,12 @@ import { cld } from '@/utils/cloudinary';
 
 const SITE_URL = (import.meta.env.VITE_SITE_URL || '').replace(/\/$/, '');
 
-/** Meta tags dinámicos + Open Graph + JSON-LD opcional */
 export default function Seo({ title, description, image, path = '', jsonLd, noindex = false }) {
   const settings = useSettingsStore((s) => s.settings);
   const siteName = `${settings.businessName} — ${settings.location}`;
   const fullTitle = title ? `${title} · ${siteName}` : settings.seo?.title || siteName;
   const desc = description || settings.seo?.description || settings.slogan;
   const ogSrc = image || settings.seo?.ogImage?.url || settings.hero?.imagesVerano?.[0]?.url;
-  // 1200x630 es el tamaño ideal para la vista previa de WhatsApp / Instagram / Facebook
   const ogImage = ogSrc ? cld(ogSrc, { width: 1200, height: 630 }) : SITE_URL ? `${SITE_URL}/og-default.jpg` : undefined;
   const url = SITE_URL ? `${SITE_URL}${path}` : undefined;
 
@@ -39,7 +37,6 @@ export default function Seo({ title, description, image, path = '', jsonLd, noin
   );
 }
 
-/** Datos estructurados schema.org/LodgingBusiness */
 export const lodgingJsonLd = (settings, { cabins = [], reviews = [] } = {}) => {
   const a = settings.address || {};
   const data = {
@@ -74,5 +71,5 @@ export const lodgingJsonLd = (settings, { cabins = [], reviews = [] } = {}) => {
       reviewCount: reviews.length,
     };
   }
-  return JSON.parse(JSON.stringify(data)); // quita undefined
+  return JSON.parse(JSON.stringify(data));
 };

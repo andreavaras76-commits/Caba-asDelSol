@@ -1,6 +1,5 @@
 import SunLogo from './SunLogo';
 
-/** Pantalla de carga entre rutas: el sol girando lento sobre el crema base */
 export default function PageLoader() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-crema" role="status">

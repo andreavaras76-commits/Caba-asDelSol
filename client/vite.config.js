@@ -11,7 +11,6 @@ export default defineConfig(({ command }) => ({
   },
   server: {
     port: 5173,
-    // Mismo origen en desarrollo: /api → backend local (igual que el rewrite de Vercel en producción)
     proxy: {
       '/api': { target: 'http://localhost:4000', changeOrigin: true },
       '/sitemap.xml': { target: 'http://localhost:4000', changeOrigin: true, rewrite: () => '/api/sitemap.xml' },
@@ -19,10 +18,8 @@ export default defineConfig(({ command }) => ({
   },
   esbuild: command === 'build' ? { drop: ['console', 'debugger'], legalComments: 'none' } : undefined,
   build: {
-    sourcemap: false, // sin mapas: el código de producción no se puede leer "como fuente" en DevTools
-    // Sin <link rel=modulepreload>: los chunks no compiten con el primer pintado del shell del hero
+    sourcemap: false,
     modulePreload: false,
-    // Separa las librerías pesadas en chunks propios para mejorar el cacheo
     rollupOptions: {
       output: {
         manualChunks: {

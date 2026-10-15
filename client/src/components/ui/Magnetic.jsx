@@ -1,10 +1,6 @@
 import { useRef } from 'react';
 import { motion, useMotionValue, useSpring, useReducedMotion } from 'framer-motion';
 
-/**
- * Envuelve un botón/link y lo "atrae" levemente hacia el cursor.
- * En touch o con movimiento reducido no hace nada.
- */
 export default function Magnetic({ children, strength = 0.3, className = '' }) {
   const ref = useRef(null);
   const reduce = useReducedMotion();

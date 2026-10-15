@@ -30,10 +30,6 @@ const Stars = ({ value, size = 'h-4 w-4' }) => (
   </span>
 );
 
-/**
- * Reseñas y seguimiento de opiniones: lo que respondieron los huéspedes a los que se les pidió
- * su opinión por WhatsApp (desde Clientes), más las cargadas a mano. Se elige cuáles publicar.
- */
 export default function Reviews() {
   const [tab, setTab] = useState('respondida');
   const [adding, setAdding] = useState(false);

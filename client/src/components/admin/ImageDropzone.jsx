@@ -6,13 +6,8 @@ import Swal from '@/utils/swal';
 const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
 const ACCEPT = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'];
-// Las fotos se achican en el navegador antes de subir (utils/bulkUpload), así que se aceptan originales más pesados
 const ORIGINAL_MAX_MB = 40;
 
-/**
- * Zona para arrastrar o elegir imágenes. Valida formato y tamaño antes de subir
- * `progress` ({ done, total }) muestra la barra de la carga masiva.
- */
 export default function ImageDropzone({ onFiles, multiple = true, uploading = false, progress = null, label, compact = false }) {
   const text = label || (multiple ? 'Arrastrá todas las fotos que quieras o tocá para elegir' : 'Arrastrá una foto acá o tocá para elegir');
   const inputId = useId();
@@ -33,7 +28,6 @@ export default function ImageDropzone({ onFiles, multiple = true, uploading = fa
     const ok = files.filter((f) => !bad.includes(f));
     if (inputRef.current) inputRef.current.value = '';
     if (!ok.length) return;
-    // Varias: las achica la carga masiva de a una. Una sola: se achica acá.
     onFiles(multiple ? ok : [await compressImage(ok[0])]);
   };
 

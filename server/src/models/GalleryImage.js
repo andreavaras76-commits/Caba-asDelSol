@@ -9,7 +9,7 @@ const galleryImageSchema = new Schema(
     height: Number,
     alt: { type: String, trim: true, default: '' },
     category: { type: String, enum: GALLERY_CATEGORIES, required: true },
-    cabin: { type: Schema.Types.ObjectId, ref: 'Cabin', default: null }, // sólo si category = cabanas
+    cabin: { type: Schema.Types.ObjectId, ref: 'Cabin', default: null },
     order: { type: Number, default: 0 },
     active: { type: Boolean, default: true },
   },

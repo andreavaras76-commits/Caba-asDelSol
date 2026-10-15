@@ -1,14 +1,7 @@
 const { body, param } = require('express-validator');
 const { LIMITS } = require('../utils/constants');
 
-/*
- * Reglas reutilizables. Cada validator espeja el esquema Zod homónimo de client/src/schemas.
- * `partial = true` vuelve todo opcional (para PUT/PATCH).
- */
-
 const mongoIdParam = (name = 'id') => param(name).isMongoId().withMessage('Identificador inválido');
-
-const opt = (chain, partial) => (partial ? chain.optional() : chain);
 
 const text = (field, { min = 0, max = LIMITS.SHORT_TEXT_MAX, required = false, label = field, partial = false } = {}) => {
   let chain = body(field);
@@ -66,7 +59,6 @@ const url = (field, label = field) =>
     .isURL({ protocols: ['http', 'https'], require_protocol: true })
     .withMessage(`${label} debe ser una URL válida (https://…)`);
 
-/** Teléfono de WhatsApp: sólo dígitos con código de país, ej. 5493815027738 */
 const whatsapp = (field, { required = false, label = 'El WhatsApp', partial = false } = {}) => {
   let chain = body(field);
   chain = required && !partial ? chain.exists({ values: 'falsy' }).withMessage(`${label} es obligatorio`).bail() : chain.optional({ values: 'falsy' });
@@ -76,4 +68,4 @@ const whatsapp = (field, { required = false, label = 'El WhatsApp', partial = fa
     .withMessage(`${label} debe tener entre 10 y 15 dígitos, con código de país (ej: 5493815027738)`);
 };
 
-module.exports = { mongoIdParam, opt, text, bool, int, number, date, oneOf, arrayOf, mongoIdArray, url, whatsapp };
+module.exports = { mongoIdParam, text, bool, int, number, date, oneOf, arrayOf, mongoIdArray, url, whatsapp };

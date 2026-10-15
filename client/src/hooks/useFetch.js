@@ -1,13 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-/** Caché en memoria por clave: navegar entre páginas no repite pedidos */
 const cache = new Map();
 
-/**
- * Hook mínimo de datos: { data, loading, error, reload }.
- * @param {string|null} key  clave de caché (null = no pedir)
- * @param {() => Promise<any>} fetcher
- */
 export default function useFetch(key, fetcher) {
   const [state, setState] = useState(() => ({ data: key ? cache.get(key) : undefined, loading: key ? !cache.has(key) : false, error: null }));
   const fetcherRef = useRef(fetcher);
@@ -21,7 +15,6 @@ export default function useFetch(key, fetcher) {
     try {
       const data = await fetcherRef.current();
       cache.set(key, data);
-      // Si mientras tanto cambió la clave (otro filtro), esta respuesta ya no corresponde
       if (keyRef.current === key) setState({ data, loading: false, error: null });
     } catch (error) {
       if (keyRef.current === key) setState({ data: cache.get(key), loading: false, error });
@@ -38,7 +31,6 @@ export default function useFetch(key, fetcher) {
 
 export const clearFetchCache = (key) => (key ? cache.delete(key) : cache.clear());
 
-/** Valor con retardo (para buscadores: no pedir en cada tecla) */
 export function useDebounced(value, delay = 350) {
   const [debounced, setDebounced] = useState(value);
   useEffect(() => {

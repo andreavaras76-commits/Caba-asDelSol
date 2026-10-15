@@ -1,12 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { animate, useInView, useReducedMotion } from 'framer-motion';
 
-/** Número que cuenta desde 0 al entrar en pantalla */
 export default function Counter({ value, suffix = '', prefix = '', duration = 2, className = '' }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-60px' });
   const reduce = useReducedMotion();
-  // Si el valor tiene decimales (1,5 km) animamos y mostramos con un decimal
   const decimals = Number.isInteger(Number(value)) ? 0 : 1;
   const [display, setDisplay] = useState(reduce ? value : 0);
 

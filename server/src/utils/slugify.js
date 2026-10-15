@@ -1,4 +1,3 @@
-/** "Cabaña El Pelado" → "cabana-el-pelado" */
 module.exports = (text = '') =>
   text
     .toString()

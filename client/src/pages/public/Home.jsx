@@ -3,20 +3,14 @@ import { useLocation } from 'react-router-dom';
 import Seo from '@/components/ui/Seo';
 import Hero from '@/components/public/Hero';
 
-// Debajo del hero: chunk aparte (no bloquea el primer render)
 const loadSections = () => import('./HomeSections');
 const HomeSections = lazy(loadSections);
 
-/**
- * Monta las secciones de abajo recién cuando el hero ya se pintó y el navegador está libre,
- * así no compiten por la CPU del celular en la primera carga.
- * Si se llega con un ancla (/#tafi) o el usuario scrollea, se montan enseguida.
- */
 function useDeferredMount(immediate) {
   const [ready, setReady] = useState(immediate);
   useEffect(() => {
     if (ready) return undefined;
-    loadSections(); // empieza a descargar ya
+    loadSections();
     const go = () => setReady(true);
     const idle = window.requestIdleCallback ? window.requestIdleCallback(go, { timeout: 1500 }) : setTimeout(go, 600);
     window.addEventListener('scroll', go, { once: true, passive: true });

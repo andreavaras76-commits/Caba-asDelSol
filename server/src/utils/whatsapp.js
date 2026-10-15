@@ -2,10 +2,6 @@ const { formatDateAR } = require('./dates');
 
 const SLEEPING_LABELS = { matrimonial: 'Matrimonial', individuales: 'Individuales' };
 
-/**
- * Arma el mensaje prearmado de una consulta.
- * Es la misma plantilla que client/src/utils/whatsapp.js (el front la usa como respaldo si la API no responde).
- */
 function buildInquiryMessage(inq, businessName = 'Cabañas del Sol') {
   const lines = [];
 
@@ -35,7 +31,6 @@ function buildInquiryMessage(inq, businessName = 'Cabañas del Sol') {
   return lines.join('\n');
 }
 
-// api.whatsapp.com/send en vez de wa.me: el redireccionamiento de wa.me rompe los emojis en WhatsApp Web
 const waLink = (phone, text) => `https://api.whatsapp.com/send?phone=${String(phone).replace(/\D/g, '')}&text=${encodeURIComponent(text)}`;
 
 module.exports = { buildInquiryMessage, waLink };

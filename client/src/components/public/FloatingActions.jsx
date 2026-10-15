@@ -14,13 +14,11 @@ function WhatsAppIcon(props) {
   );
 }
 
-/** Botón flotante de WhatsApp (derecha) + flecha de scroll (izquierda) */
 export default function FloatingActions() {
   const { contact, businessName } = useSettingsStore((s) => s.settings);
   const scrolled = useScrolled(400);
   const [tooltip, setTooltip] = useState(false);
 
-  // El tooltip aparece una vez a los pocos segundos y se va solo
   useEffect(() => {
     const show = setTimeout(() => setTooltip(true), 4000);
     const hide = setTimeout(() => setTooltip(false), 11000);
@@ -39,7 +37,6 @@ export default function FloatingActions() {
 
   return (
     <>
-      {/* Flecha de scroll */}
       <motion.button
         type="button"
         onClick={onArrow}
@@ -56,7 +53,6 @@ export default function FloatingActions() {
         </AnimatePresence>
       </motion.button>
 
-      {/* WhatsApp */}
       <div className="fixed bottom-5 right-4 z-40 flex items-center gap-3 sm:right-6">
         <AnimatePresence>
           {tooltip && (

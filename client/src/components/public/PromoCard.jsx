@@ -3,7 +3,6 @@ import CldImage from '@/components/ui/CldImage';
 import { SEASONS } from '@/utils/constants';
 import { formatDayLong, promoBadge } from '@/utils/format';
 
-/** Tarjeta de promoción. Se reutiliza en la vista previa del panel. */
 export default function PromoCard({ promo, onWant, preview = false }) {
   const cabinNames = promo.appliesToAll ? 'Todas las cabañas' : (promo.cabins || []).map((c) => c.name).filter(Boolean).join(', ');
   return (

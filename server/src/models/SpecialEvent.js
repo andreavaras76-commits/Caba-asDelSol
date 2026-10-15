@@ -1,7 +1,6 @@
 const { Schema, model } = require('mongoose');
 const Image = require('./schemas/Image');
 
-/** Eventos especiales de temporada (Navidad, Año Nuevo…): se activan o desactivan cada año */
 const specialEventSchema = new Schema(
   {
     title: { type: String, required: true, trim: true },

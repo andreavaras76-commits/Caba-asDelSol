@@ -5,10 +5,8 @@ const { success } = require('../utils/response');
 const { bodyData, flatten } = require('../utils/requestData');
 const { uploadMany, uploadBuffer, destroyImage } = require('../utils/cloudinaryUpload');
 
-/** Grupo de imágenes → ruta dentro del documento de configuración */
 const IMAGE_GROUPS = {
   heroVerano: { path: 'hero.imagesVerano', multiple: true },
-  heroInvierno: { path: 'hero.imagesInvierno', multiple: true },
   about: { path: 'about.images', multiple: true },
   events: { path: 'events.images', multiple: true },
   og: { path: 'seo.ogImage', multiple: false },
@@ -41,7 +39,6 @@ exports.uploadImages = asyncHandler(async (req, res) => {
 
   if (group.multiple) {
     const uploaded = await uploadMany(files, 'sitio');
-    // $push atómico: la carga masiva sube varias fotos en paralelo
     await Settings.updateOne({ _id: settings._id }, { $push: { [group.path]: { $each: uploaded } } });
     return success(res, await Settings.getSingleton(), 'Imágenes subidas');
   } else {

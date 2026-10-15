@@ -1,7 +1,3 @@
-/**
- * Isotipo del sol (rayos azules, sol amarillo, colina verde).
- * Versión estática y liviana; la versión animada del hero se arma en la Etapa 3.
- */
 export default function SunLogo({ className = 'h-10 w-10', title = 'Cabañas del Sol' }) {
   const rays = [-60, -30, 0, 30, 60];
   return (

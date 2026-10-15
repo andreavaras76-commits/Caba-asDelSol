@@ -72,7 +72,6 @@ export default function CabinDetail() {
             </ul>
           </Reveal>
 
-          {/* Galería */}
           <Reveal delay={0.1} className="mt-8">
             {ordered.length === 0 ? (
               <div className="overflow-hidden rounded-4xl shadow-calida">
@@ -80,7 +79,6 @@ export default function CabinDetail() {
               </div>
             ) : (
               <>
-                {/* Mobile: carrusel */}
                 <div className="sm:hidden">
                   <Swiper modules={[Pagination]} pagination={{ clickable: true }} spaceBetween={12} className="overflow-hidden rounded-4xl">
                     {ordered.map((img, i) => (
@@ -92,7 +90,6 @@ export default function CabinDetail() {
                     ))}
                   </Swiper>
                 </div>
-                {/* Desktop: mosaico */}
                 <div className="hidden h-[520px] grid-cols-4 grid-rows-2 gap-3 overflow-hidden rounded-4xl sm:grid">
                   {ordered.slice(0, 5).map((img, i) => (
                     <button

@@ -24,7 +24,6 @@ export default function Cabins() {
   const reorder = async (next) => {
     setItems(next);
     try {
-      // Pocas cabañas: actualizamos sólo las que cambiaron de posición
       await Promise.all(next.map((c, order) => (c.order !== order ? adminApi.cabins.update(c._id, { order }) : null)));
       toastSuccess('Orden guardado');
       refresh();

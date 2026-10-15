@@ -9,17 +9,11 @@ const PhotoLightbox = lazy(() => import('@/components/ui/PhotoLightbox'));
 
 const PAGE = 12;
 
-
-/**
- * Galería masonry con filtros (Todas / Cabaña 1… / Pileta / Quincho / Invierno / Entorno), lightbox y descarga.
- * Los filtros salen de las fotos cargadas: una cabaña sin fotos no tiene chip.
- */
 export default function Gallery({ images = [] }) {
   const [filter, setFilter] = useState('todas');
   const [limit, setLimit] = useState(PAGE);
   const [open, setOpen] = useState(-1);
 
-  // Filtros fijos, iguales a las categorías del panel. Las fotos de cada cabaña entran en "Cabañas".
   const tabs = useMemo(() => [['todas', 'Todos'], ...Object.entries(GALLERY_CATEGORIES)], []);
 
   useEffect(() => setLimit(PAGE), [filter]);
@@ -30,7 +24,6 @@ export default function Gallery({ images = [] }) {
   }, [images, filter]);
   const visible = filtered.slice(0, limit);
 
-  // Nombre de descarga: cabanas-del-sol-{categoria}-{n}
   const forLightbox = useMemo(() => {
     const counters = {};
     return filtered.map((img) => {

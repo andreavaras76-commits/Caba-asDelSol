@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 
-/** true cuando el scroll vertical supera `offset` px */
 export default function useScrolled(offset = 40) {
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {

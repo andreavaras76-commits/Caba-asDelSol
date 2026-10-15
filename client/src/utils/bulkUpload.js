@@ -1,13 +1,5 @@
-/**
- * Carga masiva de fotos.
- * - Achica cada foto en el navegador (lado mayor 2400 px, calidad web) antes de subirla:
- *   las fotos de celular pesan 5–15 MB y Vercel rechaza cualquier envío de más de 4,5 MB.
- * - Las sube de a una (varias en paralelo) para que ninguna supere ese límite,
- *   y si alguna falla sigue con las demás.
- */
-
 const MAX_SIDE = 2400;
-const TARGET_BYTES = 3.8 * 1024 * 1024; // margen debajo de los 4,5 MB de Vercel
+const TARGET_BYTES = 3.8 * 1024 * 1024;
 const CONCURRENCY = 3;
 
 const loadImage = (file) =>
@@ -27,7 +19,6 @@ const loadImage = (file) =>
 
 const toBlob = (canvas, type, quality) => new Promise((resolve) => canvas.toBlob(resolve, type, quality));
 
-/** Devuelve la foto lista para subir (achicada si hace falta). Si algo falla, devuelve la original. */
 export async function compressImage(file) {
   try {
     const img = await loadImage(file);
@@ -38,7 +29,6 @@ export async function compressImage(file) {
     canvas.width = Math.round(img.naturalWidth * scale);
     canvas.height = Math.round(img.naturalHeight * scale);
     const ctx = canvas.getContext('2d');
-    // Las PNG con transparencia quedan sobre fondo blanco (se guardan como JPG)
     ctx.fillStyle = '#fff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
@@ -47,7 +37,7 @@ export async function compressImage(file) {
     let blob = await toBlob(canvas, 'image/jpeg', quality);
     while (blob && blob.size > TARGET_BYTES && quality > 0.5) {
       quality -= 0.1;
-      blob = await toBlob(canvas, 'image/jpeg', quality); // eslint-disable-line no-await-in-loop
+      blob = await toBlob(canvas, 'image/jpeg', quality);
     }
     if (!blob || (blob.size >= file.size && file.size <= TARGET_BYTES)) return file;
     const name = file.name.replace(/\.[^.]+$/, '') + '.jpg';
@@ -57,11 +47,6 @@ export async function compressImage(file) {
   }
 }
 
-/**
- * Sube las fotos de a una con `sendOne(file)`.
- * `onProgress({ done, total, phase })` se llama en cada paso para mostrar la barra.
- * Devuelve { ok: [respuestas], failed: [{ name, message }] }.
- */
 export async function bulkUpload(files, sendOne, onProgress = () => {}) {
   const total = files.length;
   const ok = [];
@@ -74,8 +59,8 @@ export async function bulkUpload(files, sendOne, onProgress = () => {}) {
     while (next < total) {
       const file = files[next++];
       try {
-        const ready = await compressImage(file); // eslint-disable-line no-await-in-loop
-        ok.push(await sendOne(ready)); // eslint-disable-line no-await-in-loop
+        const ready = await compressImage(file);
+        ok.push(await sendOne(ready));
       } catch (err) {
         failed.push({ name: file.name, message: err?.message || 'No se pudo subir' });
       }

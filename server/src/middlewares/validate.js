@@ -1,10 +1,6 @@
 const { validationResult } = require('express-validator');
 const ApiError = require('../utils/ApiError');
 
-/**
- * Ejecuta una lista de reglas de express-validator y, si alguna falla,
- * responde 400 con { field, message } por cada error (mismo formato que muestra el front).
- */
 module.exports = (rules) => [
   ...rules,
   (req, res, next) => {

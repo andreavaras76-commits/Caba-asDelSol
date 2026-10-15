@@ -1,7 +1,3 @@
-/**
- * Espejo 1:1 de server/src/utils/constants.js (+ etiquetas en castellano para la UI).
- * Si cambiás algo allá, cambialo acá.
- */
 export const LIMITS = {
   NAME_MIN: 2,
   NAME_MAX: 80,
@@ -40,7 +36,6 @@ export const BED_TYPES = {
   divan_cama: { label: 'diván cama', plural: 'divanes cama', icon: 'Sofa' },
 };
 
-/** Ambientes donde puede estar una cama ("¿Dónde vas a dormir?") */
 export const BED_LOCATIONS = {
   dormitorio: 'Dormitorio',
   cocina_comedor: 'Cocina comedor',
@@ -52,7 +47,6 @@ export const CABIN_TYPES = {
   monoambiente: 'Monoambiente',
 };
 
-/** Lo que el huésped elige al consultar */
 export const SLEEPING_OPTIONS = {
   matrimonial: 'Cama matrimonial',
   individuales: 'Camas individuales',
@@ -86,8 +80,6 @@ export const SEASONS = {
   fines_largos: 'Fines de semana largos',
   todo_el_anio: 'Todo el año',
 };
-
-export const INQUIRY_TYPES = ['cabana', 'evento', 'promo', 'general'];
 
 export const INQUIRY_STATUS = {
   nueva: 'Nueva',

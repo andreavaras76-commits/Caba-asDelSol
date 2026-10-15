@@ -1,15 +1,12 @@
 import api from './axios';
 
-/** Endpoints del panel. Todas las funciones devuelven `{ ok, data, message }`. */
-
 const form = (field, files) => {
   const fd = new FormData();
   [].concat(files).forEach((f) => fd.append(field, f));
   return fd;
 };
 
-/** CRUD estándar para un recurso /admin/<path> */
-export const resource = (path) => ({
+const resource = (path) => ({
   list: (params) => api.get(`/admin/${path}`, { params }),
   get: (id) => api.get(`/admin/${path}/${id}`),
   create: (data) => api.post(`/admin/${path}`, data),

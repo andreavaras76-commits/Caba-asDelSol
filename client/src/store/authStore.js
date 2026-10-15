@@ -1,10 +1,6 @@
 import { create } from 'zustand';
 import api from '@/api/axios';
 
-/**
- * Sesión del panel. No guarda tokens: la sesión es una cookie httpOnly que maneja el navegador.
- * El rol que vemos acá sólo decide qué se muestra; los permisos reales los valida siempre el backend.
- */
 export const useAuthStore = create((set) => ({
   user: null,
   ready: false,
@@ -20,11 +16,9 @@ export const useAuthStore = create((set) => ({
     try {
       await api.post('/auth/logout');
     } catch {
-      /* si falla igual cerramos del lado del cliente */
     }
   },
 
-  /** Consulta la sesión actual al entrar al panel (responde null sin error si no hay) */
   bootstrap: async () => {
     try {
       const { data } = await api.get('/auth/session');
@@ -37,5 +31,4 @@ export const useAuthStore = create((set) => ({
   setUser: (user) => set({ user }),
 }));
 
-// El interceptor avisa cuando el backend responde 401: la sesión venció o la revocaron
 window.addEventListener('auth:expired', () => useAuthStore.setState({ user: null, ready: true }));

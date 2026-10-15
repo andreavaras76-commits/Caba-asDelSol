@@ -2,11 +2,6 @@ import { z } from 'zod';
 import { LIMITS, SLEEPING_OPTIONS, EVENT_MIN_HOURS } from '@/utils/constants';
 import { todayISO, overlapsBlocked } from '@/utils/format';
 
-/*
- * Espejo de server/src/validators/inquiry.validator.js.
- * Los formularios trabajan con fechas "YYYY-MM-DD" (inputs nativos), que se comparan bien como texto.
- */
-
 const name = z
   .string({ required_error: 'Tu nombre es obligatorio' })
   .trim()
@@ -31,10 +26,6 @@ const guests = (max) =>
     .min(1, 'Tiene que haber al menos 1 huésped')
     .max(max, `Máximo ${max} ${max === 1 ? 'huésped' : 'huéspedes'}`);
 
-/**
- * Consulta de estadía (hero, detalle de cabaña).
- * @param {{ maxGuests?: number, requireCabin?: boolean, blocked?: Array }} opts
- */
 export const makeStaySchema = ({ maxGuests = LIMITS.GUESTS_MAX, requireCabin = false, blocked = [], sleepingOptions = Object.keys(SLEEPING_OPTIONS) } = {}) =>
   z
     .object({
@@ -60,7 +51,6 @@ export const makeStaySchema = ({ maxGuests = LIMITS.GUESTS_MAX, requireCabin = f
       message: 'Sin disponibilidad en esas fechas. Probá con otras.',
     });
 
-/** Evento / día de campo */
 export const makeEventSchema = ({ capacity = LIMITS.GUESTS_MAX, minHours = EVENT_MIN_HOURS } = {}) =>
   z
     .object({
@@ -83,7 +73,6 @@ export const makeEventSchema = ({ capacity = LIMITS.GUESTS_MAX, minHours = EVENT
     })
     .refine((d) => d.eventDate >= todayISO(), { path: ['eventDate'], message: 'La fecha del evento no puede ser pasada' });
 
-/** "Quiero esta promo": fechas opcionales, pero si hay una tiene que estar la otra */
 export const makePromoSchema = ({ maxGuests = LIMITS.GUESTS_MAX } = {}) =>
   z
     .object({

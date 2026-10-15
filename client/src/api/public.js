@@ -1,6 +1,5 @@
 import api from './axios';
 
-/** Endpoints públicos. Cada función devuelve directamente `data`. */
 const get = (url, params) => api.get(url, { params }).then((r) => r.data);
 
 export const publicApi = {
@@ -18,6 +17,5 @@ export const publicApi = {
   submitFeedback: (token, data) => api.post(`/feedback/${token}`, data),
   gallery: (category) => get('/gallery', category ? { category } : undefined),
   blockedDates: (cabin) => get('/blocked-dates', { cabin }),
-  /** Devuelve { id, message, whatsappUrl } */
   createInquiry: (payload) => api.post('/inquiries', payload).then((r) => r.data),
 };

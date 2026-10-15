@@ -10,7 +10,6 @@ import LazyMap from '@/components/ui/LazyMap';
 
 export default function Footer() {
   const { pathname } = useLocation();
-  /** El logo lleva al home; si ya estás ahí, sube suave hasta arriba */
   const onLogo = (e) => {
     if (pathname === '/') {
       e.preventDefault();

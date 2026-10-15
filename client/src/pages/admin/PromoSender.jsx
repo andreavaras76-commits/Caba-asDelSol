@@ -25,10 +25,6 @@ const defaultTemplate = (promo, businessName) =>
     .filter(Boolean)
     .join('\n');
 
-/**
- * Envío de promociones cliente por cliente (sin API de Meta, sin envíos masivos):
- * cada botón abre WhatsApp con el mensaje personalizado y marca al cliente como enviado.
- */
 export default function PromoSender() {
   const businessName = useSettingsStore((s) => s.settings.businessName);
   const { data: promos } = useFetch('admin-promos', () => adminApi.promotions.list().then((r) => r.data));
@@ -45,12 +41,12 @@ export default function PromoSender() {
   }, [usable, promoId]);
   useEffect(() => {
     if (promo) setTemplate(defaultTemplate(promo, businessName));
-  }, [promo?._id]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [promo?._id]);
 
   const params = promoId ? { promotion: promoId, tags: tags.join(',') || undefined, pending: pendingOnly ? 'true' : undefined, limit: 100 } : null;
   const key = params ? `admin-send-${JSON.stringify(params)}` : null;
   const { data, loading, reload } = useFetch(key, () => adminApi.clients.list(params).then((r) => r.data));
-  const [local, setLocal] = useState({}); // marcas optimistas
+  const [local, setLocal] = useState({});
 
   useEffect(() => setLocal({}), [key]);
 

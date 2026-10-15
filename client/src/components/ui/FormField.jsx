@@ -1,6 +1,5 @@
 import { forwardRef, useId } from 'react';
 
-/** Label + control + mensaje de error accesible (aria-invalid / aria-describedby) */
 export function Field({ label, error, hint, children, className = '', light = false }) {
   const id = useId();
   const errorId = `${id}-error`;
@@ -23,10 +22,6 @@ export function Field({ label, error, hint, children, className = '', light = fa
   );
 }
 
-/**
- * Pregunta de sí/no como select (más claro que un switch).
- * Uso con RHF Controller: <YesNoSelect value={field.value} onChange={field.onChange} label="¿Viajás con mascota?" />
- */
 export function YesNoSelect({ value, onChange, label, light = false, yes = 'Sí', no = 'No', className = '' }) {
   const id = useId();
   return (
@@ -47,7 +42,6 @@ export function YesNoSelect({ value, onChange, label, light = false, yes = 'Sí'
   );
 }
 
-/** Switch accesible (role="switch") para usar con RHF Controller o value/onChange */
 export const Toggle = forwardRef(function Toggle({ checked, onChange, label, light = false, id }, ref) {
   return (
     <button

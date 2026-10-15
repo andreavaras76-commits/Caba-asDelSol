@@ -16,10 +16,6 @@ import useFetch from '@/hooks/useFetch';
 import { publicApi } from '@/api/public';
 import { useSettingsStore } from '@/store/settingsStore';
 
-/**
- * Todo lo que está debajo del hero. Se descarga en un chunk aparte para que
- * el primer render (lo que se ve al entrar desde el celular) sea lo más liviano posible.
- */
 export default function HomeSections() {
   const settings = useSettingsStore((s) => s.settings);
   const [promoToAsk, setPromoToAsk] = useState(null);

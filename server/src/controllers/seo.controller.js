@@ -4,7 +4,6 @@ const asyncHandler = require('../utils/asyncHandler');
 
 const xmlEscape = (s) => String(s).replace(/[<>&'"]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' })[c]);
 
-/** sitemap.xml dinámico: home + cada cabaña activa (el front lo expone en /sitemap.xml) */
 exports.sitemap = asyncHandler(async (req, res) => {
   const base = env.SITE_URL;
   const cabins = await Cabin.find({ active: true }).select('slug updatedAt').sort({ order: 1 }).lean();

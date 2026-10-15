@@ -9,10 +9,8 @@ const item = {
   show: { opacity: 1, y: 0, scale: 1, transition: { type: 'spring', damping: 16, stiffness: 170 } },
 };
 
-// Los íconos van rotando entre los colores del logo
 const TONES = ['bg-cerro text-white', 'bg-cielo text-white', 'bg-tejido text-white', 'bg-cerro-profundo text-sol-200', 'bg-madera text-crema'];
 
-/** Rayos del sol detrás del título (giran lento) */
 function SunRays() {
   const reduce = useReducedMotion();
   return (
@@ -30,7 +28,6 @@ function SunRays() {
   );
 }
 
-/** Servicios (tarjetas con ícono) + espacios comunes del predio destacados, sobre un fondo soleado */
 export default function Services({ services = [] }) {
   const servicios = services.filter((s) => (s.group || 'servicio') === 'servicio');
   const espacios = services.filter((s) => s.group === 'espacio');

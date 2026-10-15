@@ -3,11 +3,9 @@
 @tailwind utilities;
 
 @layer base {
-  /* Celulares chicos (iPhone SE): las columnas de una grilla pueden achicarse en vez de empujar el contenido fuera de la pantalla */
   .grid > * {
     min-width: 0;
   }
-  /* iOS les da un ancho mínimo propio a los campos de fecha */
   input[type="date"],
   input[type="time"] {
     min-width: 0;
@@ -17,7 +15,6 @@
   input[type="date"]::-webkit-date-and-time-value {
     text-align: left;
   }
-  /* Sin scroll lateral en toda la página (`clip` no rompe los elementos sticky/fixed como `hidden`) */
   html,
   body {
     max-width: 100%;
@@ -30,7 +27,6 @@
   }
 
   html {
-    /* Framer Motion (useScroll) necesita un contenedor posicionado */
     position: relative;
     scroll-behavior: smooth;
     -webkit-tap-highlight-color: transparent;
@@ -48,12 +44,10 @@
     font-optical-sizing: auto;
   }
 
-  /* Foco visible y consistente para navegación por teclado */
   :focus-visible {
     @apply outline-none ring-2 ring-sol ring-offset-2 ring-offset-crema;
   }
 
-  /* Edge/IE agregan su propio "ojo" y "x" en los inputs: usamos sólo los nuestros */
   input::-ms-reveal,
   input::-ms-clear {
     display: none;
@@ -64,12 +58,10 @@
   }
 }
 
-/* El shell del hero sólo aplica a la portada (ver public/boot.js) */
 .no-shell #hero-shell {
   display: none;
 }
 
-/* Scroll del sidebar del panel: fino y discreto */
 .sidebar-scroll {
   scrollbar-width: thin;
   scrollbar-color: rgba(251, 246, 236, 0.18) transparent;
@@ -128,7 +120,6 @@
   }
 }
 
-/* SweetAlert2 con la estética del sitio */
 .swal-sol {
   @apply rounded-4xl bg-crema font-sans text-carbon !important;
 }
@@ -136,7 +127,6 @@
   @apply font-serif text-cerro-profundo !important;
 }
 
-/* Swiper: bullets en la paleta */
 .swiper-pagination-bullet {
   @apply h-2.5 w-2.5 bg-cerro-profundo opacity-30 transition-all !important;
 }
@@ -151,7 +141,6 @@
 }
 
 @layer utilities {
-  /* Brillo de carga para skeletons */
   .skeleton {
     background: linear-gradient(100deg, #f3eada 30%, #fbf6ec 50%, #f3eada 70%);
     background-size: 200% 100%;
@@ -162,7 +151,6 @@
     to { background-position: -200% 0; }
   }
 
-  /* Textura sutil de lana tejida para fondos */
   .textura-tejido {
     background-image: repeating-linear-gradient(
         45deg,
@@ -177,7 +165,6 @@
   }
 }
 
-/* Respeta a quienes prefieren menos movimiento */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

@@ -1,9 +1,5 @@
 import { Check } from 'lucide-react';
 
-/**
- * Selección múltiple con chips (amenities, etiquetas, cabañas).
- * options: [{ value, label, icon? }]
- */
 export default function Chips({ options, value = [], onChange, label }) {
   const toggle = (v) => onChange(value.includes(v) ? value.filter((x) => x !== v) : [...value, v]);
   return (

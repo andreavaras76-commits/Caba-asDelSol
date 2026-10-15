@@ -5,13 +5,8 @@ import Swal from '@/utils/swal';
 
 const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
-/**
- * Carga masiva para el panel: sube de a una con `sendOne(file)`, muestra el progreso
- * y al final avisa cuántas subieron y cuáles fallaron.
- * `onDone(responses)` recibe las respuestas exitosas (para refrescar la pantalla).
- */
 export default function useBulkUpload(sendOne, onDone) {
-  const [progress, setProgress] = useState(null); // { done, total } mientras sube
+  const [progress, setProgress] = useState(null);
 
   const upload = async (files) => {
     const { ok, failed } = await bulkUpload(files, sendOne, setProgress);

@@ -3,13 +3,6 @@ import { publicApi } from '@/api/public';
 import { useSettingsStore } from '@/store/settingsStore';
 import { buildInquiryMessage, waLink } from '@/utils/whatsapp';
 
-/**
- * Guarda la consulta en la base y abre WhatsApp con el mensaje prearmado.
- *
- * - Abre la pestaña ANTES del await (si no, el navegador la bloquea como popup).
- * - Si el backend rechaza por validación o disponibilidad (400/409), mostramos el motivo.
- * - Si el backend no responde (red, 429, 5xx), igual abrimos WhatsApp con el mensaje armado acá.
- */
 export default function useWhatsAppInquiry() {
   const [sending, setSending] = useState(false);
   const settings = useSettingsStore((s) => s.settings);
@@ -30,7 +23,6 @@ export default function useWhatsAppInquiry() {
     } catch (err) {
       if (err.status === 400 || err.status === 409) {
         win?.close();
-        // SweetAlert se descarga sólo si hay que mostrar un aviso
         const { default: Swal } = await import('@/utils/swal');
         await Swal.fire({
           icon: err.status === 409 ? 'info' : 'warning',
@@ -40,7 +32,6 @@ export default function useWhatsAppInquiry() {
         });
         return false;
       }
-      // Respaldo: no perdemos la consulta aunque falle el registro
       const message = buildInquiryMessage({ ...payload, cabinName, promotionTitle }, settings.businessName);
       go(waLink(settings.contact.whatsapp, message));
       return true;
@@ -52,5 +43,4 @@ export default function useWhatsAppInquiry() {
   return { send, sending };
 }
 
-/** Quita strings vacíos para no mandar campos opcionales en blanco */
 const clean = (obj) => Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== '' && v !== undefined && v !== null));

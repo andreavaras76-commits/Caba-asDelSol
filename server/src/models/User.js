@@ -5,13 +5,12 @@ const { ROLES } = require('../utils/constants');
 const userSchema = new Schema(
   {
     name: { type: String, required: true, trim: true },
-    // Usuario de ingreso: minúsculas, números, punto, guion y guion bajo
     username: { type: String, required: true, unique: true, lowercase: true, trim: true },
     password: { type: String, required: true, select: false },
     role: { type: String, enum: ROLES, default: 'admin' },
     active: { type: Boolean, default: true },
     lastLogin: Date,
-    passwordChangedAt: Date, // invalida las sesiones emitidas antes del cambio
+    passwordChangedAt: Date,
   },
   { timestamps: true }
 );

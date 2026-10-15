@@ -1,11 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { MapPin } from 'lucide-react';
 
-/**
- * Mapa de Google embebido con carga diferida ("fachada"): mientras no está en pantalla
- * muestra una vista previa liviana. El iframe de Google pesa ~500 KB de JavaScript,
- * así que sólo lo cargamos cuando la persona llega a verlo (o toca "Ver mapa").
- */
 export default function LazyMap({ src, title, className = '', label = 'Ver mapa' }) {
   const ref = useRef(null);
   const [load, setLoad] = useState(false);
@@ -32,7 +27,6 @@ export default function LazyMap({ src, title, className = '', label = 'Ver mapa'
         <iframe title={title} src={src} className="absolute inset-0 h-full w-full" loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
       ) : (
         <button type="button" onClick={() => setLoad(true)} className="group absolute inset-0 flex h-full w-full items-center justify-center" aria-label={`${label}: ${title}`}>
-          {/* Vista previa ilustrada: curvas de nivel del valle */}
           <svg viewBox="0 0 400 240" preserveAspectRatio="xMidYMid slice" className="absolute inset-0 h-full w-full" aria-hidden="true">
             <rect width="400" height="240" fill="#E8F0E3" />
             {[0, 1, 2, 3, 4].map((i) => (

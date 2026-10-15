@@ -7,7 +7,6 @@ const { success, created } = require('../utils/response');
 const { bodyData, flatten } = require('../utils/requestData');
 const { uploadMany, destroyImage, destroyMany } = require('../utils/cloudinaryUpload');
 
-/** Oculta el precio si el switch global o el de la cabaña están apagados */
 const publicCabin = (cabin, showPrices) => {
   const obj = cabin.toJSON();
   if (!showPrices || !obj.price?.show) obj.price = { amount: null, show: false };
@@ -17,7 +16,6 @@ const publicCabin = (cabin, showPrices) => {
 const uniqueSlug = async (base, excludeId) => {
   let slug = slugify(base);
   let i = 2;
-  // eslint-disable-next-line no-await-in-loop
   while (await Cabin.exists({ slug, _id: { $ne: excludeId } })) slug = `${slugify(base)}-${i++}`;
   return slug;
 };
@@ -27,8 +25,6 @@ const findCabin = async (id) => {
   if (!cabin) throw ApiError.notFound('Cabaña no encontrada');
   return cabin;
 };
-
-// ---------- Público ----------
 
 exports.listPublic = asyncHandler(async (req, res) => {
   const [cabins, settings] = await Promise.all([Cabin.find({ active: true }).sort({ order: 1, createdAt: 1 }), Settings.getSingleton()]);
@@ -40,8 +36,6 @@ exports.getBySlug = asyncHandler(async (req, res) => {
   if (!cabin) throw ApiError.notFound('Cabaña no encontrada');
   success(res, publicCabin(cabin, settings.showPrices));
 });
-
-// ---------- Admin ----------
 
 exports.listAll = asyncHandler(async (req, res) => {
   success(res, await Cabin.find().sort({ order: 1, createdAt: 1 }));
@@ -72,18 +66,14 @@ exports.remove = asyncHandler(async (req, res) => {
   success(res, null, 'Cabaña eliminada');
 });
 
-// ---------- Galería de la cabaña ----------
-
 exports.uploadImages = asyncHandler(async (req, res) => {
   const cabin = await findCabin(req.params.id);
   const uploaded = await uploadMany(req.files, `cabanas/${cabin.slug}`);
-  // $push atómico: la carga masiva sube varias fotos en paralelo y ninguna debe pisar a otra
   const images = uploaded.map((img) => ({ ...img, alt: `${cabin.name} — Cabañas del Sol, Tafí del Valle` }));
   await Cabin.updateOne({ _id: cabin._id }, { $push: { images: { $each: images } } }, { runValidators: true });
   success(res, await findCabin(cabin._id), `${uploaded.length} ${uploaded.length === 1 ? 'imagen subida' : 'imágenes subidas'}`);
 });
 
-/** Reordena (drag & drop) y define la portada */
 exports.reorderImages = asyncHandler(async (req, res) => {
   const cabin = await findCabin(req.params.id);
   const byId = new Map(cabin.images.map((img) => [String(img._id), img]));

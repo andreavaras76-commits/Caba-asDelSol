@@ -8,10 +8,6 @@ import { PlaceCard } from './Nearby';
 import { useSettingsStore } from '@/store/settingsStore';
 import { NEARBY_CATEGORIES } from '@/utils/constants';
 
-/**
- * Destino Tafí del Valle: lugares para conocer + "todo cerca tuyo" (delivery, súper, estación…),
- * todo en una sola sección con filtros, y el clima en vivo al costado.
- */
 export default function Tafi({ attractions = [], places = [] }) {
   const { address, contact, businessName } = useSettingsStore((s) => s.settings);
 
@@ -29,7 +25,7 @@ export default function Tafi({ attractions = [], places = [] }) {
   const order = Object.keys(NEARBY_CATEGORIES);
   const sortedPlaces = useMemo(
     () => [...places].sort((a, b) => order.indexOf(a.category) - order.indexOf(b.category) || (a.order ?? 0) - (b.order ?? 0)),
-    [places] // eslint-disable-line react-hooks/exhaustive-deps
+    [places]
   );
   const visiblePlaces = active === 'cerca' ? sortedPlaces : sortedPlaces.filter((p) => p.category === active);
 

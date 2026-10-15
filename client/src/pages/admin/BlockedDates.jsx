@@ -10,7 +10,6 @@ import { blockedDateSchema } from '@/schemas/admin.schema';
 import { formatDay, todayISO, nightsBetween, isoToInputUTC } from '@/utils/format';
 import { confirmDelete, notifySuccess, notifyError, handleFormError } from '@/utils/notify';
 
-/** Rangos ocupados por cabaña: el formulario público muestra "sin disponibilidad" */
 export default function BlockedDates() {
   const [onlyUpcoming, setOnlyUpcoming] = useState(true);
   const key = `admin-blocked-${onlyUpcoming}`;
@@ -59,7 +58,6 @@ export default function BlockedDates() {
   const end = watch('endDate');
   const nights = start && end && end > start ? nightsBetween(start, end) : 0;
 
-  // Agrupado por cabaña
   const groups = (data || []).reduce((acc, b) => {
     const k = b.cabin?._id || 'x';
     (acc[k] ||= { cabin: b.cabin, items: [] }).items.push(b);

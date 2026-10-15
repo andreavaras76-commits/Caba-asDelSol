@@ -2,7 +2,6 @@ import { motion } from 'framer-motion';
 
 const EASE = [0.22, 1, 0.36, 1];
 
-/** Aparece suavemente (fade + subida) al entrar en pantalla */
 export default function Reveal({ children, delay = 0, y = 28, className = '', as = 'div', once = true, ...rest }) {
   const Comp = motion[as] || motion.div;
   return (
@@ -19,7 +18,6 @@ export default function Reveal({ children, delay = 0, y = 28, className = '', as
   );
 }
 
-/** Contenedor para animar hijos en cascada (stagger) */
 export const staggerContainer = (stagger = 0.08) => ({
   hidden: {},
   show: { transition: { staggerChildren: stagger } },

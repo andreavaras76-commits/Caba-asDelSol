@@ -1,11 +1,5 @@
-/**
- * Datos iniciales del negocio. Los usa el seed (instalaciones nuevas) y la migración (base existente).
- * Todo es editable después desde el panel.
- */
 const MAPS_URL = 'https://maps.app.goo.gl/2kcL473RB16yd4FR9';
 const mapsSearch = (q) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
-
-const DISTANCE_TEXT = 'A 1,5 km de la Villa de Tafí, a menos de 5 minutos en auto.';
 
 const settingsData = {
   key: 'main',
@@ -78,7 +72,6 @@ const settingsData = {
   },
 };
 
-/** Comodidades de cada cabaña (sin hogar a leña). La galería la tienen todas menos la 6. */
 const amenitiesFor = (n) => [
   'wifi',
   'tv',
@@ -95,7 +88,6 @@ const amenitiesFor = (n) => [
   ...(n === 6 ? [] : ['galeria']),
 ];
 
-/** Cabañas 1 a 4: dormitorio + cocina comedor. Cabañas 5 y 6: monoambiente. */
 const dormitorio = (n) => ({
   name: `Cabaña ${n}`,
   slug: `cabana-${n}`,
@@ -139,7 +131,6 @@ const monoambiente = (n) => ({
   order: n - 1,
 });
 
-// Las 7 a 11 se cargan como las 1 a 4 (editar desde el panel si su distribución es otra)
 const cabinsData = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((n) => (n === 5 || n === 6 ? monoambiente(n) : dormitorio(n)));
 
 const servicesData = [
@@ -154,13 +145,11 @@ const servicesData = [
   { name: 'Aceptamos mascotas', icon: 'PawPrint' },
   { name: 'Baño privado', icon: 'Bath' },
   { name: 'Termotanque eléctrico', icon: 'ShowerHead' },
-  // Espacios comunes del predio
   { name: 'Asadores', icon: 'Flame', group: 'espacio', description: 'Para los asados de cada día.' },
   { name: 'Pileta para niños y para adultos', icon: 'Waves', group: 'espacio', description: 'Dos piletas: una para los más chicos y otra para adultos.' },
   { name: 'Sala de estar', icon: 'Sofa', group: 'espacio', description: 'Un espacio común para compartir.' },
 ].map((s, order) => ({ group: 'servicio', ...s, order }));
 
-// Distancias aproximadas: revisarlas desde el panel
 const attractionsData = [
   {
     name: 'La Villa de Tafí',
@@ -234,10 +223,6 @@ const faqsData = [
   },
 ].map((f, order) => ({ ...f, order }));
 
-/**
- * "Todo cerca tuyo". Los teléfonos vienen vacíos para completar desde el panel.
- * Los que todavía no tienen nombre quedan ocultos (active: false) hasta cargarlos.
- */
 const nearbyPlacesData = [
   { name: 'Delivery de comida', category: 'delivery', description: 'Comida a domicilio en la zona.' },
   { name: 'Delivery de comida', category: 'delivery', description: 'Otra opción de comida a domicilio.' },
@@ -285,8 +270,6 @@ const specialEventsData = [
 ];
 
 module.exports = {
-  MAPS_URL,
-  DISTANCE_TEXT,
   settingsData,
   cabinsData,
   servicesData,

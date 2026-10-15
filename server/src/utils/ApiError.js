@@ -1,4 +1,3 @@
-/** Error con código HTTP para lanzar desde controladores y middlewares */
 class ApiError extends Error {
   constructor(status, message, errors = []) {
     super(message);

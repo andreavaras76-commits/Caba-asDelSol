@@ -2,7 +2,6 @@ import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion, useScroll } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import HeroLandscape from '@/components/illustrations/HeroLandscape';
-// El buscador (React Hook Form + Zod) se carga aparte para aliviar el primer render
 const HeroSearch = lazy(() => import('./HeroSearch'));
 import useFetch from '@/hooks/useFetch';
 import { publicApi } from '@/api/public';
@@ -18,14 +17,11 @@ export default function Hero() {
   const reduce = useReducedMotion();
   const { data: cabins } = useFetch('cabins', publicApi.cabins);
   const settings = useSettingsStore((s) => s.settings);
-  // Fondo: las fotos de portada cargadas en el panel; si no hay, las portadas de las cabañas
   const heroPhotos = settings.hero.imagesVerano || [];
   const images = heroPhotos.length ? heroPhotos : (cabins || []).map((c) => c.cover).filter(Boolean);
   const [index, setIndex] = useState(0);
-  // useScroll en el mismo componente que el ref (evita leer el ref antes de montarse)
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'], layoutEffect: false });
 
-  // Slideshow con Ken Burns cuando hay fotos cargadas
   useEffect(() => {
     setIndex(0);
     if (images.length < 2 || reduce) return undefined;
@@ -33,7 +29,6 @@ export default function Hero() {
     return () => clearInterval(t);
   }, [images.length, reduce]);
 
-  // Al cambiar de temporada el índice puede quedar fuera de rango hasta que corre el efecto
   const current = images.length ? images[index % images.length] : null;
 
   const title = settings.hero.title || settings.businessName;
@@ -41,7 +36,6 @@ export default function Hero() {
 
   return (
     <section ref={ref} className="relative isolate flex min-h-[100svh] flex-col overflow-hidden bg-cielo-800" aria-label="Portada">
-      {/* Fondo: fotos reales o paisaje ilustrado */}
       <div className="absolute inset-0 -z-10">
         {images.length ? (
           <>
@@ -69,7 +63,6 @@ export default function Hero() {
         ) : (
           <>
             <HeroLandscape season="verano" scrollYProgress={scrollYProgress} />
-            {/* Velo para legibilidad del texto */}
             <div className="absolute inset-0 bg-gradient-to-b from-cielo-900/50 via-transparent to-transparent" />
           </>
         )}

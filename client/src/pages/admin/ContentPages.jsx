@@ -6,8 +6,6 @@ import { getIcon } from '@/utils/icons';
 import { isoToInputUTC, formatDayLong } from '@/utils/format';
 import { Mountain, HelpCircle, Quote, PartyPopper } from 'lucide-react';
 
-/** Páginas de contenido simple, todas sobre el mismo CRUD genérico */
-
 export function ServicesPage() {
   return (
     <ContentCrud

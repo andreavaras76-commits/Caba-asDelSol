@@ -4,7 +4,6 @@ const { LIMITS } = require('../utils/constants');
 
 const ALLOWED = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'];
 
-/** Multer en memoria: el buffer va directo a Cloudinary, nada se escribe en disco */
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: LIMITS.IMAGE_MAX_MB * 1024 * 1024, files: 20 },
@@ -14,7 +13,6 @@ const upload = multer({
   },
 });
 
-/** Exige al menos un archivo después de multer */
 const requireFiles = (req, res, next) => {
   const hasFiles = req.file || (req.files && req.files.length);
   if (!hasFiles) return next(ApiError.badRequest('Tenés que adjuntar al menos una imagen'));

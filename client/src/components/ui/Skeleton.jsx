@@ -1,4 +1,3 @@
-/** Bloque de carga con brillo suave */
 export default function Skeleton({ className = '' }) {
   return <div className={`skeleton rounded-2xl ${className}`} aria-hidden="true" />;
 }

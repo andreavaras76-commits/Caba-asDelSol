@@ -1,7 +1,3 @@
-/**
- * Silueta de cerros en capas para separar secciones.
- * `from` es el color de la sección de arriba (fondo del SVG), `to` el de la de abajo.
- */
 export default function MountainDivider({ from = 'transparent', to = '#FBF6EC', accent = '#2F5D3A', flip = false, className = '' }) {
   return (
     <div className={`pointer-events-none relative -mb-px w-full ${className}`} style={{ background: from }} aria-hidden="true">

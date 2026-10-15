@@ -8,7 +8,6 @@ import useWhatsAppInquiry from '@/hooks/useWhatsAppInquiry';
 import { todayISO } from '@/utils/format';
 import { EVENT_TYPES, EVENT_MIN_HOURS } from '@/utils/constants';
 
-/** Formulario de eventos / día de campo → WhatsApp */
 export default function EventForm({ capacity = 30, lodgingOptional = true, minHours = EVENT_MIN_HOURS }) {
   const { send, sending } = useWhatsAppInquiry();
   const {

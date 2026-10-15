@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 
-/** Cuenta regresiva hasta `target`. Devuelve null si no hay fecha o ya pasó. */
 export default function useCountdown(target) {
   const calc = () => {
     if (!target) return null;
@@ -19,7 +18,7 @@ export default function useCountdown(target) {
     if (!target) return undefined;
     const t = setInterval(() => setLeft(calc()), 1000);
     return () => clearInterval(t);
-  }, [target]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [target]);
 
   return left;
 }
