@@ -1,10 +1,6 @@
 import { Component } from 'react';
 import SunLogo from './SunLogo';
 
-/**
- * Si un componente falla al renderizar, mostramos una pantalla amable
- * en lugar de dejar la página en blanco (y sin exponer detalles técnicos).
- */
 export default class ErrorBoundary extends Component {
   constructor(props) {
     super(props);
