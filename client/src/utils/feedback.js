@@ -2,7 +2,7 @@ import { adminApi } from '@/api/admin';
 import { waLink } from './whatsapp';
 
 // Sitio público: si el panel se usa en local, el link igual tiene que abrir desde el celular del huésped
-const PUBLIC_SITE = (import.meta.env.VITE_SITE_URL || 'https://caba-as-del-sol.vercel.app').replace(/\/$/, '');
+const PUBLIC_SITE = (import.meta.env.VITE_SITE_URL || 'https://caba-as-del-sol-nu.vercel.app').replace(/\/$/, '');
 const isLocal = () => /^(localhost|127\.|192\.168\.|10\.)/.test(window.location.hostname);
 
 /** Link público para que el huésped deje su opinión */
