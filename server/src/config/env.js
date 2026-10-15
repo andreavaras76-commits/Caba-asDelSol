@@ -1,5 +1,8 @@
 require('dotenv').config();
 
+// Al pegar valores en el panel de Vercel suelen colarse espacios o tabs: se limpian todos
+for (const k of Object.keys(process.env)) if (typeof process.env[k] === 'string') process.env[k] = process.env[k].trim();
+
 const required = ['MONGODB_URI', 'JWT_SECRET'];
 const missing = required.filter((key) => !process.env[key]);
 if (missing.length) {
@@ -11,7 +14,7 @@ module.exports = {
   PORT: Number(process.env.PORT) || 4000,
   MONGODB_URI: process.env.MONGODB_URI,
   JWT_SECRET: process.env.JWT_SECRET,
-  SITE_URL: (process.env.SITE_URL || 'https://delsoltafidelvalle.com.ar').replace(/\/$/, ''),
+  SITE_URL: (process.env.SITE_URL || 'https://www.delsoltafidelvalle.com.ar').replace(/\/$/, ''),
   JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '7d',
   CORS_ORIGINS: (process.env.CORS_ORIGINS || 'http://localhost:5173')
     .split(',')
