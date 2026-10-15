@@ -42,7 +42,6 @@ export default function Inquiries() {
     setFilters((f) => ({ ...f, [k]: e.target.value }));
   };
 
-  /** Pide el WhatsApp (si la consulta no lo trae) y crea/vincula el cliente */
   const askPhoneAndLink = async (inq) => {
     const { value, isConfirmed } = await Swal.fire({
       titleText: `WhatsApp de ${inq.name}`,
@@ -63,7 +62,6 @@ export default function Inquiries() {
     try {
       const res = await adminApi.inquiries.update(inq._id, { status });
       notifySuccess(res.message || `Marcada como "${INQUIRY_STATUS[status]}"`);
-      // Reservó: el cliente se crea solo; si falta el teléfono, lo pedimos una vez
       if (status === 'reservo' && res.data?.needsPhone) await askPhoneAndLink(inq);
       refresh();
     } catch (err) {
@@ -92,7 +90,6 @@ export default function Inquiries() {
     }
   };
 
-  /** Pasar a cliente: si la consulta no trae teléfono, lo pedimos */
   const toClient = async (inq) => {
     let phone = normalizeArPhone(inq.phone);
     if (!/^\d{10,15}$/.test(phone)) {

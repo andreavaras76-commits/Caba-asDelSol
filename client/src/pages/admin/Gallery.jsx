@@ -34,10 +34,8 @@ export default function Gallery() {
 
   const visible = tab === 'todas' ? items : items.filter((i) => i.category === tab);
 
-  // Carga masiva: de a una foto por envío, todas a la categoría (y cabaña) elegida
   const { upload, progress, uploading } = useBulkUpload((file) => adminApi.gallery.upload([file], uploadCategory, uploadCabin), refresh);
 
-  /** Reordena dentro del filtro actual manteniendo la posición del resto */
   const reorder = async (nextVisible) => {
     let k = 0;
     const visibleIds = new Set(visible.map((i) => i.id));
