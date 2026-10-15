@@ -55,7 +55,7 @@ export default function PromotionForm() {
   const navigate = useNavigate();
   const [promo, setPromo] = useState(null);
   const [loading, setLoading] = useState(!isNew);
-  const [pendingFile, setPendingFile] = useState(null); // imagen elegida antes de crear
+  const [pendingFile, setPendingFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const { data: cabins = [] } = useFetch('admin-cabins', () => adminApi.cabins.list().then((r) => r.data));
 
@@ -135,7 +135,7 @@ export default function PromotionForm() {
   };
 
   const onImage = async ([file]) => {
-    if (isNew) return setPendingFile(file); // se sube al crear
+    if (isNew) return setPendingFile(file);
     try {
       await uploadImage(id, file);
       invalidate();

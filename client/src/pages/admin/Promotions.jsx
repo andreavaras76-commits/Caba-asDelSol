@@ -9,7 +9,6 @@ import { confirmDelete, notifySuccess, notifyError } from '@/utils/notify';
 import { formatDay, promoBadge } from '@/utils/format';
 import { SEASONS } from '@/utils/constants';
 
-/** Estado calculado igual que el virtual isCurrent del backend */
 export const promoStatus = (p, now = new Date()) => {
   if (!p.active) return ['Inactiva', 'gray'];
   if (p.startDate && new Date(p.startDate) > now) return ['Programada', 'blue'];
