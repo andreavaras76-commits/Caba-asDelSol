@@ -1,11 +1,5 @@
-let pending = null; // corrección en curso (se cancela si se pide otro scroll)
+let pending = null;
 
-/**
- * Scroll suave a una sección por id, compensando la altura del navbar.
- * Si la sección todavía no existe (las de abajo se montan después del primer pintado)
- * la espera, y durante ~1.5 s corrige la posición si el contenido de arriba cambia de alto.
- * Devuelve true si la sección ya existía.
- */
 export function scrollToId(id, offset = (document.querySelector('header')?.offsetHeight || 72)) {
   if (pending) pending();
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -30,7 +24,6 @@ export function scrollToId(id, offset = (document.querySelector('header')?.offse
   };
   let timer = setTimeout(tick, 0);
 
-  // Si la persona scrollea a mano, dejamos de corregir
   const stop = () => {
     cancelled = true;
     clearTimeout(timer);
