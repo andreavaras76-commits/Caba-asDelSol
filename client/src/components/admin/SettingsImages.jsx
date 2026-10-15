@@ -7,6 +7,7 @@ import CldImage from '@/components/ui/CldImage';
 import { adminApi } from '@/api/admin';
 import { useSettingsStore } from '@/store/settingsStore';
 import { confirmDelete, notifySuccess, notifyError } from '@/utils/notify';
+import useBulkUpload from '@/hooks/useBulkUpload';
 
 const PATHS = {
   heroVerano: (s) => s.hero.imagesVerano,
@@ -28,7 +29,14 @@ export default function SettingsImages({ group, title, hint, single = false }) {
 
   const apply = (res) => setSettings(res.data);
 
+  // Varias fotos (hero, nosotros, eventos): carga masiva de a una
+  const bulk = useBulkUpload(
+    (file) => adminApi.settings.uploadImages(group, [file]),
+    (responses) => apply(responses.reduce((a, b) => ((PATHS[group](b.data) || []).length > (PATHS[group](a.data) || []).length ? b : a)))
+  );
+
   const upload = async (files) => {
+    if (!single) return bulk.upload(files);
     setUploading(true);
     try {
       apply(await adminApi.settings.uploadImages(group, files));
@@ -63,7 +71,7 @@ export default function SettingsImages({ group, title, hint, single = false }) {
     <div>
       <p className="label">{title}</p>
       {hint && <p className="-mt-1 mb-2 text-xs text-carbon-light">{hint}</p>}
-      <ImageDropzone onFiles={upload} uploading={uploading} multiple={!single} compact label={single && items.length ? 'Reemplazar imagen' : single ? 'Subir imagen' : 'Subir fotos'} />
+      <ImageDropzone onFiles={upload} uploading={uploading || bulk.uploading} progress={bulk.progress} multiple={!single} compact label={single && items.length ? 'Reemplazar imagen' : single ? 'Subir imagen' : 'Subir fotos (podés elegir muchas juntas)'} />
       {items.length > 0 && (
         <Sortable items={items} onReorder={reorder} className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-6">
           {(img, handle) => (

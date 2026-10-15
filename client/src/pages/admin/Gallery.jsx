@@ -13,6 +13,7 @@ import { adminApi } from '@/api/admin';
 import { galleryUpdateSchema } from '@/schemas/admin.schema';
 import { GALLERY_CATEGORIES } from '@/utils/constants';
 import { confirmDelete, notifySuccess, notifyError, handleFormError } from '@/utils/notify';
+import useBulkUpload from '@/hooks/useBulkUpload';
 
 export default function Gallery() {
   const [tab, setTab] = useState('todas');
@@ -20,7 +21,6 @@ export default function Gallery() {
   const [uploadCabin, setUploadCabin] = useState('');
   const { data: cabins = [] } = useFetch('admin-cabins', () => adminApi.cabins.list().then((r) => r.data));
   const cabinName = (id) => cabins.find((c) => c._id === (id?._id || id))?.name;
-  const [uploading, setUploading] = useState(false);
   const [editing, setEditing] = useState(null);
   const { data, loading, reload } = useFetch('admin-gallery', () => adminApi.gallery.list().then((r) => r.data));
   const [items, setItems] = useState([]);
@@ -34,18 +34,8 @@ export default function Gallery() {
 
   const visible = tab === 'todas' ? items : items.filter((i) => i.category === tab);
 
-  const upload = async (files) => {
-    setUploading(true);
-    try {
-      const res = await adminApi.gallery.upload(files, uploadCategory, uploadCabin);
-      notifySuccess(res.message);
-      refresh();
-    } catch (err) {
-      notifyError(err, 'No se pudieron subir las fotos');
-    } finally {
-      setUploading(false);
-    }
-  };
+  // Carga masiva: de a una foto por envío, todas a la categoría (y cabaña) elegida
+  const { upload, progress, uploading } = useBulkUpload((file) => adminApi.gallery.upload([file], uploadCategory, uploadCabin), refresh);
 
   /** Reordena dentro del filtro actual manteniendo la posición del resto */
   const reorder = async (nextVisible) => {
@@ -104,7 +94,7 @@ export default function Gallery() {
           )}
         </div>
         <p className="-mt-2 mb-4 text-xs text-carbon-light">Las fotos de una cabaña arman su filtro en la galería del sitio (“Cabaña 1”, “Cabaña 2”…). También suman las fotos que subas desde la ficha de cada cabaña.</p>
-        <ImageDropzone onFiles={upload} uploading={uploading} />
+        <ImageDropzone onFiles={upload} uploading={uploading} progress={progress} />
       </Card>
 
       <Tabs tabs={[['todas', `Todas (${items.length})`], ...Object.entries(GALLERY_CATEGORIES).map(([k, v]) => [k, `${v} (${counts[k]})`])]} value={tab} onChange={setTab} />

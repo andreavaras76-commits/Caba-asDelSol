@@ -7,27 +7,20 @@ import CldImage from '@/components/ui/CldImage';
 import { adminApi } from '@/api/admin';
 import { confirmDelete, notifySuccess, notifyError } from '@/utils/notify';
 import Swal from '@/utils/swal';
+import useBulkUpload from '@/hooks/useBulkUpload';
 
 /** Galería de una cabaña: subir varias, reordenar con drag & drop, elegir portada, alt y borrar */
 export default function CabinGallery({ cabin, onChange }) {
-  const [uploading, setUploading] = useState(false);
   const [items, setItems] = useState([]);
   useEffect(() => setItems(cabin.images.map((img) => ({ ...img, id: img._id }))), [cabin.images]);
 
   const coverId = cabin.cover?._id;
 
-  const upload = async (files) => {
-    setUploading(true);
-    try {
-      const res = await adminApi.cabins.uploadImages(cabin._id, files);
-      notifySuccess(res.message);
-      onChange(res.data);
-    } catch (err) {
-      notifyError(err, 'No se pudieron subir las fotos');
-    } finally {
-      setUploading(false);
-    }
-  };
+  // Carga masiva: de a una foto por envío; la respuesta con más fotos es el estado final de la cabaña
+  const { upload, progress, uploading } = useBulkUpload(
+    (file) => adminApi.cabins.uploadImages(cabin._id, [file]),
+    (responses) => onChange(responses.reduce((a, b) => (b.data.images.length > a.data.images.length ? b : a)).data)
+  );
 
   const reorder = async (next, cover = coverId) => {
     setItems(next);
@@ -79,7 +72,7 @@ export default function CabinGallery({ cabin, onChange }) {
     <Card>
       <h2 className="text-xl font-semibold text-cerro-profundo">Fotos</h2>
       <p className="mb-4 text-sm text-carbon-light">Arrastrá para ordenar. La estrella marca la portada (si no elegís, se usa la primera).</p>
-      <ImageDropzone onFiles={upload} uploading={uploading} />
+      <ImageDropzone onFiles={upload} uploading={uploading} progress={progress} />
       {items.length > 0 && (
         <Sortable items={items} onReorder={(next) => reorder(next)} className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {(img, handle, dragging) => {

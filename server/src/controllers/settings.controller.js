@@ -41,7 +41,9 @@ exports.uploadImages = asyncHandler(async (req, res) => {
 
   if (group.multiple) {
     const uploaded = await uploadMany(files, 'sitio');
-    settings.get(group.path).push(...uploaded);
+    // $push atómico: la carga masiva sube varias fotos en paralelo
+    await Settings.updateOne({ _id: settings._id }, { $push: { [group.path]: { $each: uploaded } } });
+    return success(res, await Settings.getSingleton(), 'Imágenes subidas');
   } else {
     const previous = settings.get(group.path);
     settings.set(group.path, await uploadBuffer(files[0].buffer, 'sitio'));
