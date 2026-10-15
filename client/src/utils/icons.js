@@ -39,10 +39,6 @@ import {
   Wine,
 } from 'lucide-react';
 
-/**
- * Íconos disponibles para servicios, amenities, camas, eventos y lugares, por nombre
- * (lo que se guarda en la base). Se importan sólo estos para no sumar todo Lucide al bundle.
- */
 export const ICONS = {
   AirVent,
   Armchair,
