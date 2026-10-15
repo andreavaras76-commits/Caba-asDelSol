@@ -7,7 +7,6 @@ const promotion = (partial = false) => [
   text('description', { max: 2000, label: 'La descripción' }),
   oneOf('type', PROMO_TYPES, { required: true, label: 'El tipo de promoción', partial }),
 
-  // El valor depende del tipo
   body('value')
     .optional({ values: 'null' })
     .isFloat({ min: 0 })

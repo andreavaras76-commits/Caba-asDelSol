@@ -9,7 +9,6 @@ const startOfToday = () => {
 };
 
 const notPast = (label) => (value) => {
-  // Margen de un día por diferencias de zona horaria entre cliente y servidor
   if (value && new Date(value) < new Date(startOfToday().getTime() - 24 * 3600 * 1000)) {
     throw new Error(`${label} no puede ser una fecha pasada`);
   }
@@ -26,13 +25,11 @@ const create = [
     .matches(/^[\d\s()+-]{8,20}$/)
     .withMessage('Ingresá un teléfono válido'),
 
-  // Cabaña: obligatoria en consultas de tipo "cabana"
   body('cabin').if(isType('cabana')).exists({ values: 'falsy' }).withMessage('Elegí una cabaña'),
   body('cabin').optional({ values: 'falsy' }).isMongoId().withMessage('Cabaña inválida'),
   body('promotion').optional({ values: 'falsy' }).isMongoId().withMessage('Promoción inválida'),
   body('promotion').if(isType('promo')).exists({ values: 'falsy' }).withMessage('Falta la promoción'),
 
-  // Fechas de estadía: obligatorias para cabaña, opcionales para promo/general
   body('checkIn').if(isType('cabana')).exists({ values: 'falsy' }).withMessage('Elegí la fecha de entrada'),
   body('checkOut').if(isType('cabana')).exists({ values: 'falsy' }).withMessage('Elegí la fecha de salida'),
   date('checkIn', { label: 'La fecha de entrada' }),
@@ -51,7 +48,6 @@ const create = [
   bool('pets', 'Mascota'),
   body('sleepingPreference').optional({ values: 'falsy' }).isIn(SLEEPING_OPTIONS).withMessage('La preferencia de cama no es válida'),
 
-  // Evento / día de campo
   body('eventType').if(isType('evento')).exists({ values: 'falsy' }).withMessage('Contanos qué tipo de evento es'),
   text('eventType', { max: 60, label: 'El tipo de evento' }),
   body('eventDate').if(isType('evento')).exists({ values: 'falsy' }).withMessage('Elegí la fecha del evento'),

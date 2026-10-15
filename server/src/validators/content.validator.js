@@ -2,8 +2,6 @@ const { body } = require('express-validator');
 const { text, bool, int, date, oneOf, url, mongoIdArray } = require('./common');
 const { GALLERY_CATEGORIES, NEARBY_CATEGORIES, SERVICE_GROUPS, LIMITS } = require('../utils/constants');
 
-/** Validaciones de los CRUD "simples": servicios, atractivos, FAQ, reseñas, galería y fechas bloqueadas */
-
 const common = [bool('active', 'Activo'), int('order', { min: 0, max: 9999, label: 'El orden' })];
 
 const service = (partial = false) => [
@@ -49,7 +47,6 @@ const galleryUpdate = [
   ...common,
 ];
 
-/** Opinión del huésped (página pública /opinar/:token) */
 const feedbackSubmit = [
   body('rating').exists({ values: 'falsy' }).withMessage('Elegí una puntuación').bail().isInt({ min: 1, max: 5 }).withMessage('La puntuación va de 1 a 5').toInt(),
   text('text', { max: 1500, label: 'El comentario' }),
@@ -62,7 +59,6 @@ const reorder = [
   ...mongoIdArray('ids', 'El orden'),
 ];
 
-/** Teléfono libre (fijo o celular): dígitos, espacios, +, -, paréntesis */
 const phone = (field, label) =>
   body(field).optional({ values: 'falsy' }).matches(/^[\d\s()+-]{6,25}$/).withMessage(`${label} no es válido`);
 
