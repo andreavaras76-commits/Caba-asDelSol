@@ -1,6 +1,5 @@
 import Reveal from './Reveal';
 
-/** Encabezado de sección: frase manuscrita + título serif + bajada */
 export default function SectionHeading({ eyebrow, title, subtitle, align = 'center', light = false, className = '' }) {
   const alignment = align === 'center' ? 'mx-auto text-center items-center' : 'text-left items-start';
   return (
@@ -13,7 +12,6 @@ export default function SectionHeading({ eyebrow, title, subtitle, align = 'cent
   );
 }
 
-/** Pequeño separador con el sol */
 function SunRule({ light }) {
   return (
     <svg viewBox="0 0 120 16" className="mt-1 h-4 w-28" aria-hidden="true">
