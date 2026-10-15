@@ -3,7 +3,6 @@ import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
 
-/** Modal accesible: cierra con Esc o clic afuera, bloquea el scroll y devuelve el foco al cerrar */
 export default function Modal({ open, onClose, title, children, size = 'max-w-lg' }) {
   const panelRef = useRef(null);
 
