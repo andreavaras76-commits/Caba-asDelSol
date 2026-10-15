@@ -8,29 +8,28 @@ const cabinSchema = new Schema(
     slug: { type: String, required: true, unique: true, lowercase: true, trim: true },
     shortDescription: { type: String, trim: true, default: '' },
     description: { type: String, trim: true, default: '' },
-    type: { type: String, enum: CABIN_TYPES, default: 'dormitorio' }, // dormitorio + cocina comedor, o monoambiente
+    type: { type: String, enum: CABIN_TYPES, default: 'dormitorio' },
     capacity: { type: Number, required: true, min: 1 },
-    rooms: { type: Number, default: 1, min: 1 }, // ambientes
+    rooms: { type: Number, default: 1, min: 1 },
     bathrooms: { type: Number, default: 1, min: 0 },
     beds: [
       {
         _id: false,
         type: { type: String, enum: BED_TYPES, required: true },
         quantity: { type: Number, min: 1, default: 1 },
-        location: { type: String, enum: BED_LOCATIONS, default: 'dormitorio' }, // en qué ambiente está
+        location: { type: String, enum: BED_LOCATIONS, default: 'dormitorio' },
       },
     ],
-    // Todo es individual en cada cabaña: sólo los espacios comunes del complejo se comparten
     privateBathroom: { type: Boolean, default: true },
     electricWaterHeater: { type: Boolean, default: true },
-    sleepingOptions: [{ type: String, enum: SLEEPING_OPTIONS }], // opciones que se ofrecen al consultar
+    sleepingOptions: [{ type: String, enum: SLEEPING_OPTIONS }],
     amenities: [{ type: String, enum: AMENITIES }],
     price: {
-      amount: { type: Number, min: 0, default: null }, // precio de referencia por noche
+      amount: { type: Number, min: 0, default: null },
       show: { type: Boolean, default: false },
     },
-    images: [Image], // el orden del array es el orden de la galería
-    coverImageId: { type: Schema.Types.ObjectId, default: null }, // _id de una de images
+    images: [Image],
+    coverImageId: { type: Schema.Types.ObjectId, default: null },
     featured: { type: Boolean, default: false },
     active: { type: Boolean, default: true },
     order: { type: Number, default: 0 },
@@ -38,7 +37,6 @@ const cabinSchema = new Schema(
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
-/** Portada: la elegida o, si no hay, la primera de la galería */
 cabinSchema.virtual('cover').get(function cover() {
   if (!this.images?.length) return null;
   return this.images.find((img) => String(img._id) === String(this.coverImageId)) || this.images[0];
