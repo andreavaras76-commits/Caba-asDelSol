@@ -6,11 +6,6 @@ import 'yet-another-react-lightbox/styles.css';
 import 'yet-another-react-lightbox/plugins/counter.css';
 import { cld, cldDownload } from '@/utils/cloudinary';
 
-/**
- * Lightbox de fotos con zoom, contador y botón "Descargar" (se importa con lazy()).
- * images: [{ url, alt, width, height, downloadName? }]
- * downloadName: nombre sin extensión, ej. "cabanas-del-sol-pileta-3"
- */
 export default function PhotoLightbox({ images, index, onClose, downloadPrefix = 'foto' }) {
   const slides = images.map((img, i) => {
     const filename = img.downloadName || `cabanas-del-sol-${downloadPrefix}-${i + 1}`;
