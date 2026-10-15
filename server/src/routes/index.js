@@ -39,14 +39,12 @@ const router = Router();
 const id = validate([mongoIdParam('id')]);
 const admin = [protect, authorize('admin')];
 
-/* ============================ AUTH ============================ */
 router.post('/auth/login', loginLimiter, validate(v.auth.login), c.auth.login);
 router.get('/auth/me', protect, c.auth.me);
 router.get('/auth/session', c.auth.session);
 router.post('/auth/logout', c.auth.logout);
 router.put('/auth/password', protect, validate(v.auth.changePassword), c.auth.changePassword);
 
-/* ========================== PÚBLICO =========================== */
 router.get('/settings', publicLimiter, c.settings.get);
 router.get('/sitemap.xml', publicLimiter, c.seo.sitemap);
 router.get('/cabins', publicLimiter, c.cabins.listPublic);
@@ -55,13 +53,10 @@ router.get('/promotions', publicLimiter, c.promos.listPublic);
 router.get('/gallery', publicLimiter, c.gallery.listPublic);
 router.get('/blocked-dates', publicLimiter, c.blocked.listPublic);
 router.post('/inquiries', inquiryLimiter, validate(v.inquiry.create), c.inquiries.create);
-// Opinión del huésped por link personal (enviado por WhatsApp desde el panel)
 router.get('/feedback/:token', publicLimiter, c.feedback.show);
 router.post('/feedback/:token', inquiryLimiter, validate(v.content.feedback.submit), c.feedback.submit);
 Object.entries(crud).forEach(([path, ctrl]) => router.get(`/${path}`, publicLimiter, ctrl.listPublic));
 
-/* =========================== ADMIN ============================ */
-// Cabañas
 router.get('/admin/cabins', admin, c.cabins.listAll);
 router.post('/admin/cabins', admin, validate(v.cabin.create), c.cabins.create);
 router.get('/admin/cabins/:id', admin, id, c.cabins.getOne);
@@ -72,7 +67,6 @@ router.put('/admin/cabins/:id/images/order', admin, id, validate(v.cabin.reorder
 router.put('/admin/cabins/:id/images/:imageId', admin, validate([mongoIdParam('id'), mongoIdParam('imageId'), ...v.cabin.updateImage]), c.cabins.updateImage);
 router.delete('/admin/cabins/:id/images/:imageId', admin, validate([mongoIdParam('id'), mongoIdParam('imageId')]), c.cabins.deleteImage);
 
-// Promociones
 router.get('/admin/promotions', admin, c.promos.listAll);
 router.post('/admin/promotions', admin, validate(v.promo.create), c.promos.create);
 router.get('/admin/promotions/:id', admin, id, c.promos.getOne);
@@ -81,25 +75,21 @@ router.delete('/admin/promotions/:id', admin, id, c.promos.remove);
 router.post('/admin/promotions/:id/image', admin, id, ...upload.single('image'), c.promos.uploadImage);
 router.delete('/admin/promotions/:id/image', admin, id, c.promos.deleteImage);
 
-// Consultas
 router.get('/admin/inquiries', admin, validate(v.inquiry.list), c.inquiries.list);
 router.get('/admin/inquiries/stats', admin, c.inquiries.stats);
 router.patch('/admin/inquiries/:id', admin, id, validate(v.inquiry.updateStatus), c.inquiries.updateStatus);
 router.delete('/admin/inquiries/:id', admin, id, c.inquiries.remove);
 
-// Galería
 router.get('/admin/gallery', admin, c.gallery.listAll);
 router.post('/admin/gallery', admin, ...upload.many('images'), validate(v.content.gallery.upload), c.gallery.upload);
 router.put('/admin/gallery/order', admin, validate(v.content.reorder), c.gallery.reorder);
 router.put('/admin/gallery/:id', admin, id, validate(v.content.gallery.update), c.gallery.update);
 router.delete('/admin/gallery/:id', admin, id, c.gallery.remove);
 
-// Fechas bloqueadas
 router.get('/admin/blocked-dates', admin, c.blocked.listAll);
 router.post('/admin/blocked-dates', admin, validate(v.content.blockedDate), c.blocked.create);
 router.delete('/admin/blocked-dates/:id', admin, id, c.blocked.remove);
 
-// Servicios, atractivos, FAQ y reseñas (CRUD genérico)
 const crudValidators = {
   services: v.content.service,
   attractions: v.content.attraction,
@@ -122,8 +112,6 @@ Object.entries(crud).forEach(([path, ctrl]) => {
   }
 });
 
-/* ============ CLIENTES, ENVÍO DE PROMOS Y CONFIGURACIÓN ============ */
-// Clientes
 router.post('/admin/reviews/request', admin, validate(v.content.feedback.request), c.feedback.request);
 router.get('/admin/feedback', admin, c.feedback.list);
 router.get('/admin/clients', admin, c.clients.list);
@@ -134,7 +122,6 @@ router.put('/admin/clients/:id', admin, id, validate(v.client.update), c.clients
 router.delete('/admin/clients/:id', admin, id, c.clients.remove);
 router.post('/admin/clients/:id/promo-sent', admin, id, validate(v.client.markSent), c.clients.markSent);
 
-// Configuración general
 router.put('/admin/settings', admin, validate(v.settings.update), c.settings.update);
 router.post('/admin/settings/images/:group', admin, ...upload.many('images', 10), c.settings.uploadImages);
 router.put('/admin/settings/images/:group/order', admin, validate(v.content.reorder), c.settings.reorderImages);
