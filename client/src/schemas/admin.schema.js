@@ -15,11 +15,6 @@ import {
   INQUIRY_STATUS,
 } from '@/utils/constants';
 
-/*
- * Esquemas del panel. Cada uno espeja el validator homónimo de server/src/validators.
- * Los inputs numéricos vacíos se convierten a null para los campos opcionales.
- */
-
 const keys = (obj) => Object.keys(obj);
 const emptyToNull = (v) => (v === '' || v === undefined || Number.isNaN(v) ? null : v);
 
@@ -41,7 +36,7 @@ const optionalNumber = (label, min = 0, max = 1e9) =>
 
 const url = (label) => z.string().trim().url(`${label} debe ser una URL válida (https://…)`).regex(/^https?:\/\//, `${label} debe empezar con https://`).optional().or(z.literal(''));
 
-export const whatsappField = (label = 'El WhatsApp') =>
+const whatsappField = (label = 'El WhatsApp') =>
   z
     .string()
     .trim()
@@ -56,8 +51,6 @@ const password = (label = 'La contraseña') =>
     .regex(/[A-Za-z]/, `${label} debe incluir al menos una letra`)
     .regex(/\d/, `${label} debe incluir al menos un número`);
 
-/* ---------------------------------- Auth ---------------------------------- */
-
 export const loginSchema = z.object({
   username: z.string().trim().min(1, 'Ingresá tu usuario'),
   password: z.string().min(1, 'La contraseña es obligatoria'),
@@ -70,9 +63,6 @@ export const changePasswordSchema = z
     confirm: z.string(),
   })
   .refine((d) => d.newPassword === d.confirm, { path: ['confirm'], message: 'Las contraseñas no coinciden' });
-
-
-/* --------------------------------- Cabañas --------------------------------- */
 
 export const cabinSchema = z.object({
   name: text('El nombre', { required: true, min: 2, max: LIMITS.NAME_MAX }),
@@ -107,8 +97,6 @@ export const cabinSchema = z.object({
   order: int('El orden', 0, 9999),
 });
 
-/* ------------------------------- Promociones ------------------------------- */
-
 export const promotionSchema = z
   .object({
     title: text('El título', { required: true, min: 3, max: LIMITS.TITLE_MAX }),
@@ -133,14 +121,10 @@ export const promotionSchema = z
     if (d.startDate && d.endDate && d.endDate < d.startDate) ctx.addIssue({ code: 'custom', path: ['endDate'], message: 'La fecha de fin debe ser posterior a la de inicio' });
   });
 
-/* -------------------------------- Consultas -------------------------------- */
-
 export const inquiryUpdateSchema = z.object({
   status: z.enum(keys(INQUIRY_STATUS)),
   notes: text('Las notas', { max: 1000 }),
 });
-
-/* ---------------------------- Clientes ---------------------------- */
 
 export const clientSchema = z.object({
   name: text('El nombre', { required: true, min: 2, max: LIMITS.NAME_MAX }),
@@ -151,9 +135,6 @@ export const clientSchema = z.object({
   tags: z.array(z.enum(keys(CLIENT_TAGS))),
 });
 
-/* ------------------------------ Contenido simple ------------------------------ */
-
-// El orden se maneja con drag & drop, no desde el formulario
 const common = { active: z.boolean() };
 
 export const serviceSchema = z.object({
@@ -227,8 +208,6 @@ export const blockedDateSchema = z
     reason: text('El motivo', { max: 120 }),
   })
   .refine((d) => d.endDate > d.startDate, { path: ['endDate'], message: 'La fecha hasta debe ser posterior a la fecha desde' });
-
-/* ---------------------------- Configuración general ---------------------------- */
 
 export const settingsSchema = z.object({
   businessName: text('El nombre del negocio', { max: LIMITS.NAME_MAX }),
