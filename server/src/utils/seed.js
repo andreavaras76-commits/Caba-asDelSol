@@ -1,11 +1,3 @@
-/**
- * Seed inicial: cuenta única de administración, configuración real del negocio, cabañas,
- * servicios, atractivos, preguntas frecuentes, lugares cercanos y eventos especiales.
- *
- * Es idempotente: no pisa datos existentes. Cada colección se carga sólo si está vacía.
- * Para actualizar una base que ya existe, usá la migración: npm run migrate
- * Uso: npm run seed
- */
 const mongoose = require('mongoose');
 const connectDB = require('../config/db');
 const User = require('../models/User');
@@ -23,8 +15,7 @@ async function seedIfEmpty(Model, docs, label) {
     console.log(`•  ${label}: ya hay datos, se omite`);
     return;
   }
-  // create (no insertMany) para que corran los hooks y validaciones
-  for (const doc of docs) await Model.create(doc); // eslint-disable-line no-await-in-loop
+  for (const doc of docs) await Model.create(doc);
   console.log(`✓  ${label}: ${docs.length} cargados`);
 }
 
@@ -32,7 +23,6 @@ async function run() {
   await connectDB();
   console.log(`\n🌄 Seed de Cabañas del Sol → ${mongoose.connection.name}\n`);
 
-  // Cuenta única de administración (sólo si todavía no hay ninguna)
   const username = (process.env.SEED_ADMIN_USERNAME || '').trim().normalize('NFC').toLowerCase();
   const password = process.env.SEED_ADMIN_PASSWORD;
   if (!username || !password) throw new Error('Definí SEED_ADMIN_USERNAME y SEED_ADMIN_PASSWORD en el .env');
