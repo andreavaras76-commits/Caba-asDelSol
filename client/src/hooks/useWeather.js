@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 
-/** Clima en vivo de Open-Meteo (gratis, sin API key). Se refresca cada 15 minutos. */
 export default function useWeather(lat = -26.8596544, lng = -65.6869324) {
   const [state, setState] = useState({ data: null, loading: true, error: null });
 
@@ -34,7 +33,6 @@ export default function useWeather(lat = -26.8596544, lng = -65.6869324) {
   return state;
 }
 
-/** Código WMO → descripción en castellano + ícono de Lucide */
 export function describeWeather(code, isDay = 1) {
   if (code === 0) return { label: isDay ? 'Despejado' : 'Noche despejada', icon: isDay ? 'Sun' : 'Moon' };
   if (code <= 2) return { label: 'Parcialmente nublado', icon: 'CloudSun' };
