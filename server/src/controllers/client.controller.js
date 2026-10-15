@@ -12,21 +12,16 @@ const findClient = async (id) => {
   return client;
 };
 
-/** Normaliza un teléfono argentino a formato wa.me (549 + área + número) */
 const toWhatsapp = (raw = '') => {
   let digits = String(raw).replace(/\D/g, '');
   if (!digits) return '';
-  if (digits.startsWith('0')) digits = digits.slice(1); // 0381… → 381…
-  digits = digits.replace(/^(\d{2,4})15(\d{6,8})$/, '$1$2'); // quita el 15 del celular
+  if (digits.startsWith('0')) digits = digits.slice(1);
+  digits = digits.replace(/^(\d{2,4})15(\d{6,8})$/, '$1$2');
   if (!digits.startsWith('54')) digits = `549${digits}`;
   else if (!digits.startsWith('549')) digits = `549${digits.slice(2)}`;
   return digits;
 };
 
-/**
- * GET /clients?tags=familia,pareja&q=juan&promotion=<id>&pending=true
- * Con ?promotion, cada cliente trae `sent` (si ya se le envió esa promo).
- */
 exports.list = asyncHandler(async (req, res) => {
   const { tags, q, promotion, pending } = req.query;
   const filter = {};
@@ -62,7 +57,6 @@ exports.getOne = asyncHandler(async (req, res) => {
   success(res, client);
 });
 
-/** Aplica la normalización de WhatsApp al body ya validado */
 const clientData = (req) => {
   const data = bodyData(req);
   if (data.phone) data.phone = toWhatsapp(data.phone);
@@ -88,11 +82,6 @@ exports.remove = asyncHandler(async (req, res) => {
   success(res, null, 'Cliente eliminado');
 });
 
-/** Convierte una consulta en cliente con un clic (o la vincula si el teléfono ya existe) */
-/**
- * Crea o vincula el cliente de una consulta (por su WhatsApp). Devuelve null si no hay teléfono válido.
- * Se usa al tocar "Pasar a cliente" y automáticamente al marcar una consulta como "Reservó".
- */
 async function clientFromInquiry(inquiry, rawPhone) {
   const phone = toWhatsapp(rawPhone || inquiry.phone);
   if (!/^\d{10,15}$/.test(phone)) return null;
@@ -132,7 +121,6 @@ exports.fromInquiry = asyncHandler(async (req, res) => {
 
 exports.clientFromInquiry = clientFromInquiry;
 
-/** Marca / desmarca una promo como enviada a un cliente */
 exports.markSent = asyncHandler(async (req, res) => {
   const { promotion, sent = true } = req.body;
   const [client, promo] = await Promise.all([findClient(req.params.id), Promotion.exists({ _id: promotion })]);
@@ -143,5 +131,3 @@ exports.markSent = asyncHandler(async (req, res) => {
   await client.save();
   success(res, client, sent ? 'Marcado como enviado' : 'Marca de envío quitada');
 });
-
-exports.toWhatsapp = toWhatsapp;

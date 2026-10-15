@@ -6,7 +6,6 @@ const { success, created } = require('../utils/response');
 const { bodyData } = require('../utils/requestData');
 const { startOfDayAR } = require('../utils/dates');
 
-/** Público: rangos futuros de una cabaña (para deshabilitar fechas en el formulario) */
 exports.listPublic = asyncHandler(async (req, res) => {
   const filter = { endDate: { $gte: startOfDayAR() } };
   if (req.query.cabin) filter.cabin = req.query.cabin;
