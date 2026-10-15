@@ -1,13 +1,10 @@
 const env = require('../config/env');
 
-/** Manejo centralizado de errores → siempre { ok: false, data: null, message, errors? } */
-// eslint-disable-next-line no-unused-vars
 module.exports = (err, req, res, next) => {
   let status = err.status || 500;
   let message = err.message || 'Error interno del servidor';
   let errors = err.errors || [];
 
-  // Errores conocidos de Mongoose / Multer / JWT traducidos a mensajes claros
   if (err.name === 'ValidationError') {
     status = 400;
     message = 'Datos inválidos';
