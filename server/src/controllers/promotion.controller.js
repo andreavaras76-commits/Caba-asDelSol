@@ -14,7 +14,6 @@ const findPromo = async (id) => {
   return promo;
 };
 
-/** Vigentes: activas y dentro de su rango de fechas */
 exports.listPublic = asyncHandler(async (req, res) => {
   const promos = await Promotion.find(Promotion.currentFilter())
     .populate('cabins', CABIN_FIELDS)
@@ -22,7 +21,6 @@ exports.listPublic = asyncHandler(async (req, res) => {
   success(res, promos);
 });
 
-/** Todas, con la cantidad de consultas que generó cada una */
 exports.listAll = asyncHandler(async (req, res) => {
   const [promos, counts] = await Promise.all([
     Promotion.find().populate('cabins', CABIN_FIELDS).sort({ createdAt: -1 }),
@@ -63,7 +61,6 @@ exports.remove = asyncHandler(async (req, res) => {
   success(res, null, 'Promoción eliminada');
 });
 
-/** Sube o reemplaza la imagen (borra la anterior de Cloudinary) */
 exports.uploadImage = asyncHandler(async (req, res) => {
   const promo = await findPromo(req.params.id);
   const previous = promo.image?.public_id;
