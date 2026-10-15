@@ -1,10 +1,6 @@
 import { useState } from 'react';
 import { cld, cldSrcSet } from '@/utils/cloudinary';
 
-/**
- * <img> optimizada para Cloudinary: f_auto, q_auto, srcSet responsivo y lazy loading.
- * `priority` la carga de inmediato (para el hero / LCP).
- */
 export default function CldImage({
   src,
   alt = '',

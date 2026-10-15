@@ -1,12 +1,5 @@
-/**
- * Logo oficial (alojado en Cloudinary).
- * - variant "mark": sólo el isotipo (sol, rayos y cerro), recortado del logo completo → navbar.
- * - variant "full": logo completo con el nombre → footer.
- * Se pide con f_auto,q_auto y el ancho justo (con versión 2x para pantallas retina).
- */
-export const LOGO_URL = 'https://res.cloudinary.com/syhhxprd/image/upload/v1792002847/logo_guttwp.jpg';
+const LOGO_URL = 'https://res.cloudinary.com/syhhxprd/image/upload/v1792002847/logo_guttwp.jpg';
 
-// Recorte del isotipo dentro del JPG original (1600×1600)
 const MARK_CROP = 'c_crop,x_430,y_108,w_760,h_916';
 
 const build = (transform, width) => LOGO_URL.replace('/upload/', `/upload/${transform ? `${transform}/` : ''}f_auto,q_auto,w_${width}/`);
@@ -26,7 +19,6 @@ export default function BrandLogo({ variant = 'mark', size = 40, className = '',
       />
     );
   }
-  // El isotipo es más alto que ancho (760×916)
   const w = Math.round(size * (760 / 916));
   return (
     <img
