@@ -4,7 +4,7 @@
  * - variant "full": logo completo con el nombre → footer.
  * Se pide con f_auto,q_auto y el ancho justo (con versión 2x para pantallas retina).
  */
-export const LOGO_URL = 'https://res.cloudinary.com/dabikk5ei/image/upload/v1792002847/logo_guttwp.jpg';
+export const LOGO_URL = 'https://res.cloudinary.com/syhhxprd/image/upload/v1792002847/logo_guttwp.jpg';
 
 // Recorte del isotipo dentro del JPG original (1600×1600)
 const MARK_CROP = 'c_crop,x_430,y_108,w_760,h_916';
