@@ -2,15 +2,12 @@ import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import PageLoader from '@/components/ui/PageLoader';
 import PublicLayout from '@/layouts/PublicLayout';
-// La portada va directa (no lazy): es la página de entrada y la pinta el shell de index.html
 import Home from '@/pages/public/Home';
 
-// Code splitting por ruta: cada página se descarga recién cuando se visita
 const CabinDetail = lazy(() => import('@/pages/public/CabinDetail'));
 const NotFound = lazy(() => import('@/pages/public/NotFound'));
 const Feedback = lazy(() => import('@/pages/public/Feedback'));
 
-// Panel (nada de esto se descarga en el sitio público)
 const AdminRoot = lazy(() => import('@/layouts/AdminRoot'));
 const AdminLayout = lazy(() => import('@/layouts/AdminLayout'));
 const ProtectedRoute = lazy(() => import('@/components/admin/ProtectedRoute'));
