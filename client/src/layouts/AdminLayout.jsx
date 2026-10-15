@@ -63,7 +63,6 @@ const NAV = [
   },
 ];
 
-/** Saludo según la hora de Tafí */
 const greeting = () => {
   const h = Number(new Intl.DateTimeFormat('es-AR', { hour: 'numeric', hour12: false, timeZone: 'America/Argentina/Tucuman' }).format(new Date()));
   return h < 13 ? '¡Buen día!' : h < 20 ? '¡Buenas tardes!' : '¡Buenas noches!';
@@ -134,10 +133,8 @@ export default function AdminLayout() {
     <div className="min-h-screen bg-crema">
       <Seo title="Panel" noindex />
 
-      {/* Sidebar escritorio */}
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 bg-cerro-noche lg:block">{sidebar}</aside>
 
-      {/* Sidebar mobile (drawer) */}
       <AnimatePresence>
         {open && (
           <>
