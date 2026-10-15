@@ -11,7 +11,6 @@ import { notifySuccess, handleFormError } from '@/utils/notify';
 
 const EMPTY = { currentPassword: '', newPassword: '', confirm: '' };
 
-/** Mi cuenta (cambiar contraseña), en un modal que se abre desde el encabezado del panel */
 export default function AccountModal({ open, onClose }) {
   const user = useAuthStore((s) => s.user);
   const {
@@ -22,7 +21,6 @@ export default function AccountModal({ open, onClose }) {
     formState: { errors, isSubmitting },
   } = useForm({ resolver: zodResolver(changePasswordSchema), defaultValues: EMPTY });
 
-  // Estable: el Modal la usa como dependencia (si cambiara en cada render, movería el foco al escribir)
   const close = useCallback(() => {
     reset(EMPTY);
     onClose();

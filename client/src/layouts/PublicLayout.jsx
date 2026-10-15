@@ -9,7 +9,6 @@ import { useSettingsStore } from '@/store/settingsStore';
 import { usePromoStore } from '@/store/promoStore';
 import { scrollToId } from '@/utils/scroll';
 
-/** Layout público: navbar, transición suave entre páginas, footer y botones flotantes */
 export default function PublicLayout() {
   const location = useLocation();
   const fetchSettings = useSettingsStore((s) => s.fetchSettings);
@@ -20,11 +19,9 @@ export default function PublicLayout() {
     fetchPromos();
   }, [fetchSettings, fetchPromos]);
 
-  // Al cambiar de página: ir al ancla (#seccion) o arriba de todo
   useEffect(() => {
     const id = location.hash.replace('#', '');
     if (id) {
-      // scrollToId espera a que la sección exista y corrige si el contenido de arriba cambia de alto
       scrollToId(id);
       return undefined;
     }
@@ -38,8 +35,6 @@ export default function PublicLayout() {
         Saltar al contenido
       </a>
       <Navbar />
-      {/* Fundido de entrada en cada cambio de página (la key remonta el main).
-          Sin exit: AnimatePresence + Outlet + lazy dejaba la página nueva en opacidad 0. */}
       <motion.main id="contenido" key={location.pathname} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.45 }}>
         <Suspense fallback={<PageLoader />}>
           <Outlet />
