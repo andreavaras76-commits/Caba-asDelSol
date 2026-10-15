@@ -1,9 +1,8 @@
 const { Schema, model } = require('mongoose');
 const Image = require('./schemas/Image');
 
-const statSchema = new Schema({ value: Number, suffix: String, label: String }, { _id: false }); // value admite decimales (1,5 km)
+const statSchema = new Schema({ value: Number, suffix: String, label: String }, { _id: false });
 
-/** Documento único con toda la configuración editable del sitio */
 const settingsSchema = new Schema(
   {
     key: { type: String, default: 'main', unique: true, immutable: true },
@@ -13,8 +12,8 @@ const settingsSchema = new Schema(
     slogan: { type: String, trim: true, default: '' },
 
     contact: {
-      whatsapp: { type: String, trim: true, default: '' }, // formato wa.me: 5493815027738
-      phoneDisplay: { type: String, trim: true, default: '' }, // (0381) 15-502-7738
+      whatsapp: { type: String, trim: true, default: '' },
+      phoneDisplay: { type: String, trim: true, default: '' },
       email: { type: String, trim: true, default: '' },
       website: { type: String, trim: true, default: '' },
     },
@@ -29,7 +28,7 @@ const settingsSchema = new Schema(
       postalCode: { type: String, trim: true, default: '' },
       province: { type: String, trim: true, default: '' },
       country: { type: String, trim: true, default: 'Argentina' },
-      mapsUrl: { type: String, trim: true, default: '' }, // botón "Cómo llegar"
+      mapsUrl: { type: String, trim: true, default: '' },
       lat: { type: Number, default: null },
       lng: { type: Number, default: null },
     },
@@ -38,7 +37,6 @@ const settingsSchema = new Schema(
       title: { type: String, trim: true, default: '' },
       subtitle: { type: String, trim: true, default: '' },
       imagesVerano: [Image],
-      imagesInvierno: [Image],
     },
     about: {
       title: { type: String, trim: true, default: '' },
@@ -54,8 +52,8 @@ const settingsSchema = new Schema(
         {
           _id: false,
           label: { type: String, trim: true, required: true },
-          icon: { type: String, trim: true, default: 'Sparkles' }, // nombre de ícono de Lucide
-          badge: { type: String, trim: true, default: '' }, // ej: "Solo verano"
+          icon: { type: String, trim: true, default: 'Sparkles' },
+          badge: { type: String, trim: true, default: '' },
         },
       ],
       minHours: { type: Number, default: 3 },
@@ -64,7 +62,7 @@ const settingsSchema = new Schema(
       images: [Image],
     },
 
-    showPrices: { type: Boolean, default: false }, // interruptor global de precios
+    showPrices: { type: Boolean, default: false },
     seo: {
       title: { type: String, trim: true, default: '' },
       description: { type: String, trim: true, default: '' },
@@ -74,7 +72,6 @@ const settingsSchema = new Schema(
   { timestamps: true }
 );
 
-/** Devuelve el documento único, creándolo si no existe */
 settingsSchema.statics.getSingleton = async function getSingleton() {
   return (await this.findOne({ key: 'main' })) || this.create({ key: 'main' });
 };
