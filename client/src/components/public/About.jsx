@@ -6,7 +6,6 @@ import CabinIllustration from '@/components/illustrations/CabinIllustration';
 import { useSettingsStore } from '@/store/settingsStore';
 import { useSeasonStore } from '@/store/seasonStore';
 
-/** Nosotros / El complejo: texto institucional + collage + contadores */
 export default function About({ cabinsCount = 0 }) {
   const { about, businessName } = useSettingsStore((s) => s.settings);
   const winter = useSeasonStore((s) => s.season) === 'invierno';
@@ -15,7 +14,6 @@ export default function About({ cabinsCount = 0 }) {
   const stats = [...(about.stats || [])];
   if (cabinsCount) stats.unshift({ value: cabinsCount, suffix: '', label: cabinsCount === 1 ? 'cabaña' : 'cabañas' });
 
-  // Collage: 3 piezas (fotos si hay, ilustraciones si no)
   const tiles = [0, 1, 2].map((i) => images[i]);
 
   return (
@@ -47,7 +45,6 @@ export default function About({ cabinsCount = 0 }) {
           )}
         </div>
 
-        {/* Collage */}
         <div className="relative mx-auto grid w-full max-w-lg grid-cols-6 grid-rows-6 gap-3 sm:gap-4" style={{ aspectRatio: '1 / 1' }}>
           {tiles.map((img, i) => {
             const pos = ['col-span-4 row-span-4', 'col-span-2 col-start-5 row-span-3 row-start-2', 'col-span-3 col-start-3 row-span-2 row-start-5'][i];

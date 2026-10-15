@@ -36,10 +36,6 @@ const FAR_PATH =
 const MID_PATH = 'M0 640 Q120 560 240 600 T480 590 Q600 520 720 575 T960 560 Q1100 500 1220 570 T1440 560 V900 H0 Z';
 const NEAR_PATH = 'M0 770 Q260 650 560 705 Q820 752 1040 688 Q1260 628 1440 705 V900 H0 Z';
 
-/**
- * Paisaje ilustrado de los Valles: el sol asoma detrás de los cerros y sus rayos se despliegan
- * uno a uno; las capas tienen parallax con el scroll. Se usa cuando todavía no hay fotos del hero.
- */
 export default function HeroLandscape({ season = 'verano', scrollYProgress }) {
   const reduce = useReducedMotion();
   const p = PALETTES[season];
@@ -50,7 +46,7 @@ export default function HeroLandscape({ season = 'verano', scrollYProgress }) {
   const yMid = useTransform(scrollYProgress, [0, 1], [0, 80]);
   const yNear = useTransform(scrollYProgress, [0, 1], [0, 30]);
 
-  const rays = Array.from({ length: 11 }, (_, i) => -100 + i * 20); // grados
+  const rays = Array.from({ length: 11 }, (_, i) => -100 + i * 20);
 
   return (
     <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMax slice" className="absolute inset-0 h-full w-full" aria-hidden="true">
@@ -68,7 +64,6 @@ export default function HeroLandscape({ season = 'verano', scrollYProgress }) {
         </radialGradient>
       </defs>
 
-      {/* Cielo */}
       <motion.rect
         key={season}
         width="1440"
@@ -79,7 +74,6 @@ export default function HeroLandscape({ season = 'verano', scrollYProgress }) {
         transition={{ duration: 1.2 }}
       />
 
-      {/* Sol que sube desde atrás de los cerros */}
       <motion.g style={{ y: reduce ? 0 : ySun }}>
         <motion.g
           initial={reduce ? false : { y: 320 }}
@@ -107,7 +101,6 @@ export default function HeroLandscape({ season = 'verano', scrollYProgress }) {
         </motion.g>
       </motion.g>
 
-      {/* Cordón lejano (con nieve en invierno) */}
       <motion.g style={{ y: reduce ? 0 : yFar }}>
         <path d={FAR_PATH} fill={p.far} opacity={p.farOpacity} />
         {winter &&
@@ -123,16 +116,13 @@ export default function HeroLandscape({ season = 'verano', scrollYProgress }) {
           ))}
       </motion.g>
 
-      {/* Cerros medios */}
       <motion.g style={{ y: reduce ? 0 : yMid }}>
         <path d={MID_PATH} fill={p.mid} opacity="0.92" />
       </motion.g>
 
-      {/* Colina cercana con las cabañas */}
       <motion.g style={{ y: reduce ? 0 : yNear }}>
         <path d={NEAR_PATH} fill={p.near} />
         <path d="M0 800 Q300 700 600 742 Q860 780 1080 720 Q1280 668 1440 735 V900 H0 Z" fill={p.nearShade} opacity="0.7" />
-        {/* Árboles */}
         {[
           [520, 712, 1],
           [560, 718, 0.8],
@@ -151,7 +141,6 @@ export default function HeroLandscape({ season = 'verano', scrollYProgress }) {
         <CabinShape x={930} y={728} scale={0.8} winter={winter} smoke={winter} delay={1.4} />
       </motion.g>
 
-      {/* Transición al crema del sitio */}
       <path d="M0 900 V846 Q360 806 720 840 T1440 832 V900 Z" fill="#FBF6EC" />
     </svg>
   );
