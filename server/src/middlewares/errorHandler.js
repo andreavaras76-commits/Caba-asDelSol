@@ -20,7 +20,18 @@ module.exports = (err, req, res, next) => {
     errors = fields.map((field) => ({ field, message }));
   } else if (err.name === 'MulterError') {
     status = 400;
-    message = err.code === 'LIMIT_FILE_SIZE' ? 'La imagen supera el tamaño máximo permitido' : err.message;
+    message =
+      {
+        LIMIT_FILE_SIZE: 'La imagen supera el tamaño máximo permitido',
+        LIMIT_FILE_COUNT: 'Son demasiadas fotos en un solo envío',
+        LIMIT_UNEXPECTED_FILE: 'Se envió un archivo en un campo que no corresponde',
+      }[err.code] || 'No se pudo procesar el archivo';
+  } else if (err.type === 'entity.parse.failed') {
+    status = 400;
+    message = 'Los datos enviados no tienen un formato válido.';
+  } else if (err.type === 'entity.too.large') {
+    status = 413;
+    message = 'Los datos enviados son demasiado grandes.';
   } else if (err.message === 'Origen no permitido por CORS') {
     status = 403;
     message = 'No pudimos conectarnos con el sistema. Probá de nuevo en unos minutos.';

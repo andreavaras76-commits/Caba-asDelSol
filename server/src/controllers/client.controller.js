@@ -1,6 +1,7 @@
 const Client = require('../models/Client');
 const Inquiry = require('../models/Inquiry');
 const Promotion = require('../models/Promotion');
+const Review = require('../models/Review');
 const ApiError = require('../utils/ApiError');
 const asyncHandler = require('../utils/asyncHandler');
 const { success, created } = require('../utils/response');
@@ -79,6 +80,10 @@ exports.update = asyncHandler(async (req, res) => {
 exports.remove = asyncHandler(async (req, res) => {
   const client = await Client.findByIdAndDelete(req.params.id);
   if (!client) throw ApiError.notFound('Cliente no encontrado');
+  await Promise.all([
+    Review.deleteMany({ client: client._id, status: 'pendiente' }),
+    Inquiry.updateMany({ client: client._id }, { $set: { client: null } }),
+  ]);
   success(res, null, 'Cliente eliminado');
 });
 
