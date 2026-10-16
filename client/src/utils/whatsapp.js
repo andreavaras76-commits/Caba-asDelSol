@@ -30,6 +30,9 @@ export function buildInquiryMessage(inq, businessName = 'Cabañas del Sol') {
   return lines.join('\n');
 }
 
+export const isMobileDevice = () =>
+  /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Macintosh/.test(navigator.userAgent));
+
 export const waLink = (phone, text = '') =>
   `https://api.whatsapp.com/send?phone=${String(phone).replace(/\D/g, '')}${text ? `&text=${encodeURIComponent(text)}` : ''}`;
 

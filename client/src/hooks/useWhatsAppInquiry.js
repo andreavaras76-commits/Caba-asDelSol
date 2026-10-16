@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { publicApi } from '@/api/public';
 import { useSettingsStore } from '@/store/settingsStore';
-import { buildInquiryMessage, waLink } from '@/utils/whatsapp';
+import { buildInquiryMessage, waLink, isMobileDevice } from '@/utils/whatsapp';
 
 export default function useWhatsAppInquiry() {
   const [sending, setSending] = useState(false);
@@ -9,7 +9,7 @@ export default function useWhatsAppInquiry() {
 
   const send = async (payload, { cabinName, promotionTitle } = {}) => {
     setSending(true);
-    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const isMobile = isMobileDevice();
     const win = isMobile ? null : window.open('', '_blank');
     const go = (url) => {
       if (win && !win.closed) win.location.href = url;
