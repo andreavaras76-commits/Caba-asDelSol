@@ -1,6 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 const cache = new Map();
+const inflight = new Map();
+
+const fetchOnce = (key, fetcher) => {
+  if (!inflight.has(key)) {
+    const p = Promise.resolve()
+      .then(fetcher)
+      .finally(() => inflight.get(key) === p && inflight.delete(key));
+    inflight.set(key, p);
+  }
+  return inflight.get(key);
+};
 
 export default function useFetch(key, fetcher) {
   const [state, setState] = useState(() => ({ data: key ? cache.get(key) : undefined, loading: key ? !cache.has(key) : false, error: null }));
@@ -13,7 +24,7 @@ export default function useFetch(key, fetcher) {
     if (!key) return;
     setState((s) => ({ ...s, loading: !cache.has(key), error: null }));
     try {
-      const data = await fetcherRef.current();
+      const data = await fetchOnce(key, fetcherRef.current);
       cache.set(key, data);
       if (keyRef.current === key) setState({ data, loading: false, error: null });
     } catch (error) {
@@ -29,7 +40,15 @@ export default function useFetch(key, fetcher) {
   return { ...state, reload: load };
 }
 
-export const clearFetchCache = (key) => (key ? cache.delete(key) : cache.clear());
+export const clearFetchCache = (key) => {
+  if (key) {
+    cache.delete(key);
+    inflight.delete(key);
+  } else {
+    cache.clear();
+    inflight.clear();
+  }
+};
 
 export function useDebounced(value, delay = 350) {
   const [debounced, setDebounced] = useState(value);

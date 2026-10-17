@@ -40,10 +40,11 @@ export function scrollToId(id, offset = (document.querySelector('header')?.offse
 export const NAV_LINKS = [
   { id: 'nosotros', label: 'El complejo' },
   { id: 'cabanas', label: 'Cabañas' },
-  { id: 'promociones', label: 'Promos' },
+  { id: 'servicios', label: 'Servicios' },
   { id: 'eventos', label: 'Eventos' },
   { id: 'galeria', label: 'Galería' },
   { id: 'tafi', label: 'Tafí' },
+  { id: 'opiniones', label: 'Opiniones', mobileOnly: true },
   { id: 'ubicacion', label: 'Ubicación' },
   { id: 'faq', label: 'Preguntas', mobileOnly: true },
 ];
