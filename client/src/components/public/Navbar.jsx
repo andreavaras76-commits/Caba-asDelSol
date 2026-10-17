@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Menu, X, Instagram, MessageCircle, MapPin } from 'lucide-react';
 import SunLogo from '@/components/ui/SunLogo';
@@ -7,14 +7,13 @@ import BrandLogo from '@/components/ui/BrandLogo';
 import Magnetic from '@/components/ui/Magnetic';
 import useScrolled from '@/hooks/useScrolled';
 import { useSettingsStore } from '@/store/settingsStore';
-import { NAV_LINKS, scrollToId } from '@/utils/scroll';
+import useNavLinks from '@/hooks/useNavLinks';
 import { waLink } from '@/utils/whatsapp';
 
 export default function Navbar() {
   const scrolled = useScrolled(60);
   const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
-  const navigate = useNavigate();
   const settings = useSettingsStore((s) => s.settings);
 
   const onHome = pathname === '/';
@@ -35,12 +34,8 @@ export default function Navbar() {
     }
   };
 
-  const goTo = (id) => (e) => {
-    e.preventDefault();
-    setOpen(false);
-    if (onHome) scrollToId(id);
-    else navigate(`/#${id}`);
-  };
+  const nav = useNavLinks();
+  const goTo = (id) => nav.goTo(id, () => setOpen(false));
 
   return (
     <>
@@ -64,7 +59,7 @@ export default function Navbar() {
           </Link>
 
           <ul className="hidden items-center gap-1 xl:flex">
-            {NAV_LINKS.filter((l) => !l.mobileOnly).map((l) => (
+            {nav.links.filter((l) => !l.mobileOnly).map((l) => (
               <li key={l.id}>
                 <a
                   href={`/#${l.id}`}
@@ -118,7 +113,7 @@ export default function Navbar() {
               animate="show"
               variants={{ hidden: {}, show: { transition: { staggerChildren: 0.05, delayChildren: 0.2 } } }}
             >
-              {NAV_LINKS.map((l) => (
+              {nav.links.map((l) => (
                 <motion.li key={l.id} variants={{ hidden: { opacity: 0, x: -24 }, show: { opacity: 1, x: 0 } }}>
                   <a href={`/#${l.id}`} onClick={goTo(l.id)} className="block py-2 font-serif text-4xl font-medium transition-colors hover:text-sol">
                     {l.label}

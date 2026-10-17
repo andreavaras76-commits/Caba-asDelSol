@@ -3,13 +3,14 @@ import { Instagram, Facebook, MessageCircle, MapPin, Phone } from 'lucide-react'
 import BrandLogo from '@/components/ui/BrandLogo';
 import MountainDivider from '@/components/ui/MountainDivider';
 import { useSettingsStore } from '@/store/settingsStore';
-import { NAV_LINKS } from '@/utils/scroll';
+import useNavLinks from '@/hooks/useNavLinks';
 import { waLink } from '@/utils/whatsapp';
 import { mapEmbedUrl, fullAddress } from './Location';
 import LazyMap from '@/components/ui/LazyMap';
 
 export default function Footer() {
   const { pathname } = useLocation();
+  const nav = useNavLinks();
   const onLogo = (e) => {
     if (pathname === '/') {
       e.preventDefault();
@@ -56,9 +57,9 @@ export default function Footer() {
         <nav aria-label="Secciones" className="hidden sm:block">
           <h2 className="font-script text-2xl text-sol-200">Explorá</h2>
           <ul className="mt-3 space-y-2 text-sm">
-            {NAV_LINKS.map((l) => (
+            {nav.links.map((l) => (
               <li key={l.id}>
-                <a href={`/#${l.id}`} className="transition hover:text-sol">
+                <a href={`/#${l.id}`} onClick={nav.goTo(l.id)} className="transition hover:text-sol">
                   {l.label}
                 </a>
               </li>
